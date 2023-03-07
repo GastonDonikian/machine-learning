@@ -25,7 +25,7 @@ def replace_missing_data_average(name):
 def plot_average_median_compare(name):
     map_median = replace_missing_data_median(name)
     map_avg = replace_missing_data_average(name)
-    d = {'avg': np.array(list(map_avg)), 'median': np.array(list(map_median))}
+    d = {'Promedio': np.array(list(map_avg)), 'Mediana': np.array(list(map_median))}
     fig, ax = plt.subplots()
     ax.boxplot(d.values())
     ax.set_xticklabels(d.keys())
@@ -37,9 +37,9 @@ def plot_average_median_compare(name):
 def covariance_sex(name1):
     map1 = replace_missing_data_average(name1)
     map_sex = map(lambda x: 0 if x == "F" else 1, data["Sexo"])
-    df = pd.DataFrame({'name': np.array(list(map1)), 'sex': np.array(list(map_sex))})
+    df = pd.DataFrame({name1: np.array(list(map1)), 'Sexo': np.array(list(map_sex))})
     sns.heatmap(df.corr(), annot=True)
-    sns.set_title(name1)
+    plt.title("Correlación entre " + name1 + " y Sexo")
     plt.show()
 
 
@@ -49,7 +49,8 @@ def dispersion_sex(name1):
     y = np.array(list(map_sex))
     x = np.array(list(map1))
     fig, ax = plt.subplots()
-    ax.scatter(x, y)
+    color = np.where(y == 0, 'purple', 'skyblue')
+    ax.scatter(x, y,  c=color)
     ax.set_title(name1)
 
     plt.show()
@@ -85,6 +86,15 @@ def create_biplot(x_axis: str, y_axis: str):
 
 if __name__ == "__main__":
     data = pd.read_excel('./datosTrabajo.xls')
+    covariance_sex("Alcohol")
+    covariance_sex("Grasas_sat")
+    covariance_sex("Calorías")
+    #plot_average_median_compare("Alcohol")
+    #plot_average_median_compare("Grasas_sat")
+    #plot_average_median_compare("Calorías")
+    #dispersion_sex("Calorías vs Sexo")
+    #dispersion_sex("Grasas saturadas vs Sexo")
+    #dispersion_sex("Alcohol vs Sexo")
     # replace_missing_data_average("Alcohol")
     # replace_missing_data_average("Grasas_sat")
     # replace_missing_data_average("Calorías")
@@ -97,4 +107,4 @@ if __name__ == "__main__":
     # plot_average_median_compare("Alcohol")
     # plotAverageMedianCompare("Grasas_sat")
     # plotAverageMedianCompare("Calorías")
-    # dispersion_sex("Calorías")
+    
