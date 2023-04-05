@@ -3,7 +3,7 @@ from sklearn.model_selection import train_test_split
 from collections import Counter
 
 categories = ['Nacional', 'Destacadas', 'Deportes', 'Salud']
-most_common = 100
+most_common = 1000
 
 def filterUselessWordsAndTokenized(data):
     articles = ["la","lo","los","las","el","ella","ellos","una","unos","un","y","al","del","le"]
@@ -11,7 +11,7 @@ def filterUselessWordsAndTokenized(data):
                     "de", "desde", "durante", "en","entre", "hacia",
                     "hasta", "mediante", "para", "por", "según", 
                     "sin", "so", "sobre", "tras"]
-    extra = ["que", "su", "se", "fue", "como"]
+    extra = ["que", "su", "se", "fue", "como",'|']
     tokenized_data = data.split(' ')
     return list(filter(lambda x: x.lower() not in articles and
                         x.lower() not in prepositions and
@@ -56,29 +56,22 @@ def news():
     for news in list(salud):
         salud_filter.append(filterUselessWordsAndTokenized(news[0]))
     
-    word_counter = Counter()
-    for n in nacional_filter:
-        word_counter.update(n)
-    
-    most_common_words_nacional = [word for word, count in word_counter.most_common(most_common)]
-   
-    for n in destacadas_filter:
-        word_counter.update(n)
-    
-    most_common_words_destacadas = [word for word, count in word_counter.most_common(most_common)]
+    most_common_words_nacional = most_commons(nacional_filter)
+    most_common_words_destacadas = most_commons(destacadas_filter)
+    most_common_words_salud = most_commons(salud_filter)
+    most_common_words_deportes = most_commons(deportes_filter)
 
-    for n in salud_filter:
-        word_counter.update(n)
-    
-    most_common_words_salud = [word for word, count in word_counter.most_common(most_common)]
-
-    for n in deportes_filter:
-        word_counter.update(n)
-    
-    most_common_words_deportes = [word for word, count in word_counter.most_common(most_common)]
-
+    print(most_common_words_deportes)
     return salud_filter, destacadas_filter, deportes_filter, nacional_filter
 
+def most_commons(words):
+    word_counter = Counter()
+    for n in words:
+        word_counter.update(n)
+    
+    most_common_words = [word for word, count in word_counter.most_common(most_common)]
+
+    return most_common_words
 
 def classify_input(title_input):
      
@@ -86,6 +79,4 @@ def classify_input(title_input):
 
 
 if __name__ == "__main__":
-    #print(classify_input([1,0,1,1,0])) 
-    #print(classify_input([0,1,1,0,1])) 
     news()
