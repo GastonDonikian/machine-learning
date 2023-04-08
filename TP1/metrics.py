@@ -20,9 +20,9 @@ def cross_validation(dataset, k):
 
 def confusion_matrix(classes, predicted, expected):
     print('Confusion matrix!')
-    matrix = np.zeros((len(classes) + 1, len(classes) + 1))
+    matrix = np.zeros((len(classes), len(classes)))
     for i, j in zip(expected, predicted):
-        print(f"Expected: {i}, Predicted: {j}")
+        #print(f"Expected: {i}, Predicted: {j}")
         matrix[get_index(i)][get_index(j)] += 1
     print(matrix)
     return matrix
@@ -39,15 +39,3 @@ def get_index(category):
         return 3
 
 
-def accuracy(network, dataset, epsilon=0.1):
-    good = 0
-    bad = 0
-    for i in range(len(dataset)):
-        expected = dataset[i][1][0]
-        o = network.feedforward(dataset[i][0])
-        if (np.abs(expected - o) <= epsilon):
-            good += 1
-        else:
-            bad += 1
-    p = good / (good + bad)
-    return p

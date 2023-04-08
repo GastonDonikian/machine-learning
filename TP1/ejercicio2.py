@@ -4,6 +4,8 @@ from collections import Counter
 import re
 import random
 import metrics
+import numpy as np
+from collections import defaultdict
 
 iterations = 10
 SEED = 2023
@@ -13,6 +15,7 @@ categories = ['Nacional', 'Destacadas', 'Deportes', 'Salud']
 most_common = 1000
 
 
+#@profile
 def filterUselessWordsAndTokenized(data):
     articles = ["la", "lo", "los", "las", "el", "ella", "ellos", "una", "unos", "un", "y", "al", "del", "le"]
     prepositions = ["a", "ante", "bajo", "cabe", "con", "contra",
@@ -29,14 +32,14 @@ def filterUselessWordsAndTokenized(data):
                                  x.lower() not in extra and
                                  x.lower() not in punctuations, tokenized_data))
 
-
+#@profile
 def count_words_in_array(title, category):
     word_count = 0
     for word in title.split():
         word_count += category.count(word)
     return word_count
 
-
+#@profile
 def news_filter(data):
     dataFilter = []
     for l in data.values:
@@ -89,20 +92,17 @@ def most_commons(words):
 
     return most_common_words
 
-
+#@profile
 def map_frecuency_words(words):
-    dictonary = {}
-    count = 0
-    for t in words:
-        for w in t:
-            count += 1
+    dictionary = defaultdict(int)
 
     for t in words:
         for w in t:
-            dictonary[w] = dictonary.setdefault(w, 0) + (1 / len(words))
+            dictionary[w] +=  1
 
-    return dictonary
+    return dictionary
 
+#@profile
 def classify_input(title_input, salud_filter, destacadas_filter, deportes_filter, nacional_filter):
     # most_common_words_deportes, most_common_words_destacadas, most_common_words_nacional, most_common_words_salud = most_commons_words_list(nacional_filter, destacadas_filter, salud_filter, deportes_filter)
     dict_deportes = map_frecuency_words(deportes_filter)
@@ -124,10 +124,10 @@ def classify_input(title_input, salud_filter, destacadas_filter, deportes_filter
     tokenized_data = title_input.split(' ')
 
     for word in tokenized_data:
-        probability_deportes *= ((dict_deportes.get(word, 0) + 1) / 4)
-        probability_destacadas *= ((dict_destacadas.get(word, 0) + 1) / 4)
-        probability_nacional *= ((dict_nacional.get(word, 0) + 1) / 4)
-        probability_salud *= ((dict_salud.get(word, 0) + 1) / 4)
+        probability_deportes *= ((dict_deportes.get(word, 0) + 1) / (len_deportes + 4))
+        probability_destacadas *= ((dict_destacadas.get(word, 0) + 1) / (len_destacadas + 4))
+        probability_nacional *= ((dict_nacional.get(word, 0) + 1) / (len_nacional + 4))
+        probability_salud *= ((dict_salud.get(word, 0) + 1) / (len_salud + 4))
 
     dict = {}
     dict["Deportes"] = probability_deportes
@@ -137,10 +137,13 @@ def classify_input(title_input, salud_filter, destacadas_filter, deportes_filter
 
     return dict
 
-
-if __name__ == "__main__":
-    data = pd.read_excel('./resources/Noticias_argentinas.xlsx', nrows=20000)
+#@profile
+def main():
+    data = pd.read_excel('./resources/Noticias_argentinas.xlsx')
     data = pd.DataFrame(data, columns=['titular', 'fuente', 'categoria'])
+
+    #sacar data todo lo q no sea nacional, salud, blla
+    
 
     training, test = metrics.cross_validation(data, 10)
 
@@ -150,10 +153,17 @@ if __name__ == "__main__":
 
     predicted = []
 
-    for i in training['titular'].to_numpy():
+    l = np.random.choice(test['titular'].to_numpy(),100)
+    for idx,i in enumerate(l):
+        print(round(idx/len(test['titular'].to_numpy())*100,2),end='\r')
         dict = classify_input(i, salud_filter, destacadas_filter, deportes_filter, nacional_filter)
         category = max(dict, key=dict.get)
         predicted.append(category)
-
+    
+    print(test['titular'].to_numpy())
     metrics.confusion_matrix(categories, expected, predicted)
+
+
+if __name__ == "__main__":
+    main()
     # classify_input("Trabajadores del Buenos Aires Design cortan la avenida Libertador por el cierre del centro comercial")
