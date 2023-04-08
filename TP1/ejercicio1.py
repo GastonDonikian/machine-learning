@@ -46,8 +46,8 @@ def classify_input(qualities):
 
 
 if __name__ == "__main__":
-    #print(classify_input([1,0,1,1,0])) 
-    #print(classify_input([0,1,1,0,1])) 
+    print(classify_input([1,0,1,1,0])) 
+    print(classify_input([0,1,1,0,1])) 
 
 
     
