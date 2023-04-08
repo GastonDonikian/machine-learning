@@ -39,3 +39,9 @@ def get_index(category):
         return 3
 
 
+def accurancy(confusion_matrix):
+    correct = sum([confusion_matrix[i][i] for i in range(len(confusion_matrix))])
+    total = sum(sum(confusion_matrix))
+    result = correct / total
+    return result
+

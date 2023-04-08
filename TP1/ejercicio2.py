@@ -179,13 +179,12 @@ def main():
         print(round(idx/len(test['titular'].to_numpy())*100,2),end='\r')
         dict = classify_input(i, dict_deportes,  dict_destacadas,  dict_nacional,  dict_salud, len_deportes, len_destacadas, len_nacional, len_salud)
         category = max(dict, key=dict.get)
-        print(category)
-        print(dict)
         predicted.append(category)
     
 
 
-    metrics.confusion_matrix(categories, expected, predicted)
+    confusion_matrix_expanded = metrics.confusion_matrix(categories, expected, predicted)
+   
 
 
 if __name__ == "__main__":
