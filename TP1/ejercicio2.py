@@ -39,11 +39,16 @@ def count_words_in_array(title, category):
         word_count += category.count(word)
     return word_count
 
+def category_filter(df):
+
+    filtered_df  = df[(df['categoria'] == 'Nacional') | (df['categoria'] == 'Destacadas') | (df['categoria'] == 'Deportes') | (df['categoria']== 'Salud')]
+    return filtered_df
+
 #@profile
 def news_filter(data):
     dataFilter = []
     for l in data.values:
-        if l[2] in categories:
+        if l[1] in categories:
             dataFilter.append(l)
 
     # train, test = train_test_split(dataFilter, test_size=0.3) #Preg si se puede usar esta lib
@@ -95,25 +100,31 @@ def most_commons(words):
 #@profile
 def map_frecuency_words(words):
     dictionary = defaultdict(int)
+    
+    count = 0
+    for t in words:
+        for w in t:
+            count += 1
 
     for t in words:
         for w in t:
             dictionary[w] +=  1
 
-    return dictionary
+    return dictionary, count
+  
+
+def create_probability_dictonary(salud_filter, destacadas_filter, deportes_filter, nacional_filter):
+    dict_deportes, len_deportes = map_frecuency_words(deportes_filter)
+    dict_destacadas, len_destacadas = map_frecuency_words(destacadas_filter)
+    dict_nacional, len_nacional = map_frecuency_words(nacional_filter)
+    dict_salud, len_salud = map_frecuency_words(salud_filter)
+    return dict_deportes,  dict_destacadas,  dict_nacional,  dict_salud, len_deportes, len_destacadas, len_nacional, len_salud
+    
 
 #@profile
-def classify_input(title_input, salud_filter, destacadas_filter, deportes_filter, nacional_filter):
+def classify_input(title_input,  dict_deportes,  dict_destacadas,  dict_nacional,  dict_salud, len_deportes, len_destacadas, len_nacional, len_salud):
     # most_common_words_deportes, most_common_words_destacadas, most_common_words_nacional, most_common_words_salud = most_commons_words_list(nacional_filter, destacadas_filter, salud_filter, deportes_filter)
-    dict_deportes = map_frecuency_words(deportes_filter)
-    dict_destacadas = map_frecuency_words(destacadas_filter)
-    dict_nacional = map_frecuency_words(nacional_filter)
-    dict_salud = map_frecuency_words(salud_filter)
 
-    len_deportes = len(deportes_filter)
-    len_destacadas = len(destacadas_filter)
-    len_nacional = len(nacional_filter)
-    len_salud = len(salud_filter)
     count = len_deportes + len_destacadas + len_nacional + len_salud
 
     probability_deportes = len_deportes / count
@@ -139,28 +150,41 @@ def classify_input(title_input, salud_filter, destacadas_filter, deportes_filter
 
 #@profile
 def main():
-    data = pd.read_excel('./resources/Noticias_argentinas.xlsx')
-    data = pd.DataFrame(data, columns=['titular', 'fuente', 'categoria'])
 
-    #sacar data todo lo q no sea nacional, salud, blla
+    #training
+    data = pd.read_excel('./resources/Noticias_argentinas.xlsx')
+    data = pd.DataFrame(data, columns=['titular', 'categoria'])
     
+    data = category_filter(data)
+
 
     training, test = metrics.cross_validation(data, 10)
 
-    salud_filter, destacadas_filter, deportes_filter, nacional_filter = news_filter(training)
 
-    expected = training['categoria'].to_numpy()
+    salud_filter, destacadas_filter, deportes_filter, nacional_filter = news_filter(training)
+    dict_deportes,  dict_destacadas,  dict_nacional,  dict_salud, len_deportes, len_destacadas, len_nacional, len_salud = create_probability_dictonary(salud_filter, destacadas_filter, deportes_filter, nacional_filter)
+  
+
+   
+
+
+    
+    ######################################################################
+    expected = test['categoria'].to_numpy()
 
     predicted = []
-
-    l = np.random.choice(test['titular'].to_numpy(),100)
-    for idx,i in enumerate(l):
+    #l = np.random.choice(test['titular'].to_numpy(),100)
+    #testing
+    for idx,i in enumerate(test['titular'].to_numpy()):
         print(round(idx/len(test['titular'].to_numpy())*100,2),end='\r')
-        dict = classify_input(i, salud_filter, destacadas_filter, deportes_filter, nacional_filter)
+        dict = classify_input(i, dict_deportes,  dict_destacadas,  dict_nacional,  dict_salud, len_deportes, len_destacadas, len_nacional, len_salud)
         category = max(dict, key=dict.get)
+        print(category)
+        print(dict)
         predicted.append(category)
     
-    print(test['titular'].to_numpy())
+
+
     metrics.confusion_matrix(categories, expected, predicted)
 
 
