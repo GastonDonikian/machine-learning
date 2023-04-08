@@ -102,12 +102,10 @@ def map_frecuency_words(words):
     dictionary = defaultdict(int)
     
     count = 0
-    for t in words:
-        for w in t:
-            count += 1
 
     for t in words:
         for w in t:
+            count+=1
             dictionary[w] +=  1
 
     return dictionary, count
@@ -133,7 +131,6 @@ def classify_input(title_input,  dict_deportes,  dict_destacadas,  dict_nacional
     probability_salud = len_salud / count
 
     tokenized_data = title_input.split(' ')
-
     for word in tokenized_data:
         probability_deportes *= ((dict_deportes.get(word, 0) + 1) / (len_deportes + 4))
         probability_destacadas *= ((dict_destacadas.get(word, 0) + 1) / (len_destacadas + 4))
@@ -185,6 +182,16 @@ def main():
 
     confusion_matrix_expanded = metrics.confusion_matrix(categories, expected, predicted)
    
+    for category in categories:
+        confusion_matrix = metrics.confusion_matrix_by_category(category, expected,predicted)
+        accurancy = metrics.accurancy(confusion_matrix)
+        precision = metrics.precision(confusion_matrix)
+        f1 = metrics.F1_score(confusion_matrix)
+        print(category)
+        print(accurancy)
+        print(precision)
+        print(f1)
+
 
 
 if __name__ == "__main__":
