@@ -17,6 +17,21 @@ def cross_validation(dataset, k):
         train = dataset.drop(test_indices).reset_index(drop=True)
     return train, test
 
+def confusion_matrix_by_category(category, predicted, expected):
+    print('Confusion matrix by category')
+    matrix = np.zeros(2, 2)
+    for i, j in zip(expected, predicted):
+        if expected == predicted:
+            if category == expected:
+                matrix[0][0] += 1
+            else:
+                matrix[1][1] += 1
+        else:
+            if expected == category:
+                matrix[0][1] += 1
+            else:
+                matrix[1][0] += 1
+    return matrix
 
 def confusion_matrix(classes, predicted, expected):
     print('Confusion matrix!')
