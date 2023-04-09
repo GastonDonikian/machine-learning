@@ -47,7 +47,7 @@ def confusion_matrix(classes, predicted, expected):
 def get_index(category):
     if category == 'Deportes':
         return 0
-    if category == 'Destacadas':
+    if category == 'Economia':
         return 1
     if category == 'Nacional':
         return 2
@@ -77,6 +77,6 @@ def recall(confusion_matrix):
 def F1_score(confusion_matrix):
     r = recall(confusion_matrix)
     p = precision(confusion_matrix)
-    result = 1*p*r / (p + r)
+    result = 2*p*r / (p + r)
     return result
 
