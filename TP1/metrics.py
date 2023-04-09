@@ -31,7 +31,9 @@ def confusion_matrix_by_category(category, predicted, expected):
                 matrix[0][1] += 1
             else:
                 matrix[1][0] += 1
-    return matrix
+    tasa_falsos_positivos = matrix[0][1] / (matrix[0][0] + matrix[0][1])
+    tasa_falsos_negativos = matrix[1][0] / (matrix[1][0] + matrix[1][1])
+    return matrix, tasa_falsos_positivos, tasa_falsos_negativos
 
 
 def confusion_matrix(classes, predicted, expected):
