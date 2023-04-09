@@ -8,14 +8,19 @@ SEED = 2023
 random.seed(SEED)
 
 
+#def cross_validation(dataset, k):
+#    n = int(len(dataset) / k)
+#    dataset = dataset.sample(frac=1).reset_index(drop=True)
+#    for i in range(k):
+#        test_indices = np.random.choice(len(dataset), n, replace=False)
+#        test = dataset.iloc[test_indices].reset_index(drop=True)
+#        train = dataset.drop(test_indices).reset_index(drop=True)
+#    return train, test
+
 def cross_validation(dataset, k):
-    n = int(len(dataset) / k)
     dataset = dataset.sample(frac=1).reset_index(drop=True)
-    for i in range(k):
-        test_indices = np.random.choice(len(dataset), n, replace=False)
-        test = dataset.iloc[test_indices].reset_index(drop=True)
-        train = dataset.drop(test_indices).reset_index(drop=True)
-    return train, test
+    df_list = np.array_split(dataset, k)
+    return df_list
 
 
 def confusion_matrix_by_category(category, predicted, expected):

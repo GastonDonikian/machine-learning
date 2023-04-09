@@ -174,14 +174,27 @@ def main():
     data = category_filter(data)
 
 
-    training, test = metrics.cross_validation(data, 10)
+    #training, test = metrics.cross_validation(data, 10)
+    df_list = metrics.cross_validation(data, 10)
+    test = df_list[0]
+    training =  pd.DataFrame()
+    for j in range(1,10):
+            training = pd.concat([training,df_list[j]],axis=0)
 
+    #for i in range(10):
+    #    test = df_list[i]
+    #    training =  pd.DataFrame()
+    #    for j in range(10):
+    #        if j!=i:
+    #            training = training.concat([training,df_list[j]],axis=0)
+            
+                
 
     salud_filter, economia_filter, deportes_filter, nacional_filter = news_filter(training)
     dict_deportes,  dict_economia,  dict_nacional,  dict_salud, len_deportes, len_economia, len_nacional, len_salud = create_probability_dictonary(salud_filter, economia_filter, deportes_filter, nacional_filter)
-  
 
-   
+
+
 
 
     
@@ -197,11 +210,11 @@ def main():
         category = max(dictonary, key=dictonary.get)
         #print(i,dictonary)
         predicted.append(category)
-    
+
 
 
     confusion_matrix_expanded = metrics.confusion_matrix(categories, expected, predicted)
-   
+
     for category in categories:
         confusion_matrix = metrics.confusion_matrix_by_category(category, expected,predicted)
         print(confusion_matrix)
