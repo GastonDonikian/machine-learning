@@ -212,17 +212,19 @@ def main():
         predicted.append(category)
     individual_classifications['Actual'] = expected
     metrics.plot_roc(individual_classifications)
+
     confusion_matrix_expanded = metrics.confusion_matrix(categories, expected, predicted)
-    # for category in categories:
-    #     confusion_matrix = metrics.confusion_matrix_by_category(category, expected, predicted)
-    #     print(confusion_matrix)
-    #     # accurancy = metrics.accurancy(confusion_matrix)
-    #     # precision = metrics.precision(confusion_matrix)
-    #     # f1 = metrics.F1_score(confusion_matrix)
-    #     print(category)
-    #     # print(accurancy)
-    #     # print(precision)
-    #     # print(f1)
+
+    for category in categories:
+        confusion_matrix, tasa_falsos_positivos, tasa_falsos_negativos = metrics.confusion_matrix_by_category(category, expected, predicted)
+        print(confusion_matrix)
+        accurancy = metrics.accurancy(confusion_matrix)
+        precision = metrics.precision(confusion_matrix)
+        f1 = metrics.F1_score(confusion_matrix)
+        print(category)
+        print(accurancy)
+        print(precision)
+        print(f1)
 
 
 if __name__ == "__main__":
