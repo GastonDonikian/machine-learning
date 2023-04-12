@@ -26,16 +26,16 @@ def classifier():
 
 
 def classify_input(qualities):
-    probabilities_given_english, probabilities_given_scottish, probabilityEnglish, probabilityScottish = classifier()
+    probabilities_given_english, probabilities_given_scottish, probability_english, probability_scottish = classifier()
     for idx, i in enumerate(qualities):
         if i == 1:
-            probabilityEnglish = probabilityEnglish * (probabilities_given_english[idx])
-            probabilityScottish = probabilityScottish * (probabilities_given_scottish[idx])
+            probability_english = probability_english * (probabilities_given_english[idx])
+            probability_scottish = probability_scottish * (probabilities_given_scottish[idx])
         else:
-            probabilityEnglish = probabilityEnglish * (1 - probabilities_given_english[idx])
-            probabilityScottish = probabilityScottish * (1 - probabilities_given_scottish[idx])
-
-    return probabilityScottish, probabilityEnglish
+            probability_english = probability_english * (1 - probabilities_given_english[idx])
+            probability_scottish = probability_scottish * (1 - probabilities_given_scottish[idx])
+    total_prob = (probability_scottish + probability_english)
+    return probability_scottish/total_prob, probability_english/total_prob
 
 
 if __name__ == "__main__":

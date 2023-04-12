@@ -17,6 +17,10 @@ most_common = 1000
 
 # @profile
 def filterUselessWordsAndTokenized(data):
+    # articles = []
+    # prepositions = []
+    # extra = []
+    # punctuations = []
     articles = ["la", "lo", "los", "las", "el", "ella", "ellos", "una", "unos", "un", "y", "al", "del", "le"]
     prepositions = ["a", "ante", "bajo", "cabe", "con", "contra",
                     "de", "desde", "durante", "en", "entre", "hacia",
@@ -24,8 +28,8 @@ def filterUselessWordsAndTokenized(data):
                     "sin", "so", "sobre", "tras"]
     extra = ["que", "su", "se", "fue", "como", '|']
     data = data.lower()
-    punctuations = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>',
-                    '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', '¡', '¿']
+    # punctuations = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>',
+    #                 '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', '¡', '¿']
     tokenized_data = re.split('\W+', data)
     return list(filter(lambda x: x.lower() not in articles and
                                  x.lower() not in prepositions and
@@ -213,16 +217,16 @@ def main():
     individual_classifications['Actual'] = expected
     metrics.plot_roc(individual_classifications)
     confusion_matrix_expanded = metrics.confusion_matrix(categories, expected, predicted)
-    # for category in categories:
-    #     confusion_matrix = metrics.confusion_matrix_by_category(category, expected, predicted)
-    #     print(confusion_matrix)
-    #     # accurancy = metrics.accurancy(confusion_matrix)
-    #     # precision = metrics.precision(confusion_matrix)
-    #     # f1 = metrics.F1_score(confusion_matrix)
-    #     print(category)
-    #     # print(accurancy)
-    #     # print(precision)
-    #     # print(f1)
+    for category in categories:
+        confusion_matrix = metrics.confusion_matrix_by_category(category, expected, predicted)
+        print(confusion_matrix)
+        accurancy = metrics.accurancy(confusion_matrix)
+        precision = metrics.precision(confusion_matrix)
+        f1 = metrics.F1_score(confusion_matrix)
+        print(category)
+        print(accurancy)
+        print(precision)
+        print(f1)
 
 
 if __name__ == "__main__":
