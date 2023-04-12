@@ -18,7 +18,7 @@ random.seed(SEED)
 #    return train, test
 
 def cross_validation(dataset, k):
-    dataset = dataset.sample(frac=1).reset_index(drop=True)
+    dataset = dataset.sample(frac=1,random_state=SEED).reset_index(drop=True)
     df_list = np.array_split(dataset, k)
     return df_list
 

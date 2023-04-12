@@ -28,8 +28,8 @@ def filterUselessWordsAndTokenized(data):
                     "sin", "so", "sobre", "tras"]
     extra = ["que", "su", "se", "fue", "como", '|']
     data = data.lower()
-    # punctuations = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>',
-    #                 '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', '¡', '¿']
+    punctuations = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>',
+                    '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', '¡', '¿']
     tokenized_data = re.split('\W+', data)
     return list(filter(lambda x: x.lower() not in articles and
                                  x.lower() not in prepositions and
@@ -216,9 +216,11 @@ def main():
         predicted.append(category)
     individual_classifications['Actual'] = expected
     metrics.plot_roc(individual_classifications)
+
     confusion_matrix_expanded = metrics.confusion_matrix(categories, expected, predicted)
+
     for category in categories:
-        confusion_matrix = metrics.confusion_matrix_by_category(category, expected, predicted)
+        confusion_matrix, tasa_falsos_positivos, tasa_falsos_negativos = metrics.confusion_matrix_by_category(category, expected, predicted)
         print(confusion_matrix)
         accurancy = metrics.accurancy(confusion_matrix)
         precision = metrics.precision(confusion_matrix)
