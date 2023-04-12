@@ -18,7 +18,7 @@ random.seed(SEED)
 #    return train, test
 
 def cross_validation(dataset, k):
-    dataset = dataset.sample(frac=1,random_state=SEED).reset_index(drop=True)
+    dataset = dataset.sample(frac=1, random_state=SEED).reset_index(drop=True)
     df_list = np.array_split(dataset, k)
     return df_list
 
@@ -37,8 +37,8 @@ def confusion_matrix_by_category(category, predicted, expected):
             else:
                 matrix[1][0] += 1
     tasa_falsos_positivos = matrix[0][1] / (matrix[0][0] + matrix[0][1])
-    tasa_falsos_negativos = matrix[1][0] / (matrix[1][0] + matrix[1][1])
-    return matrix, tasa_falsos_positivos, tasa_falsos_negativos
+    tasa_verdaderos_postivos = matrix[0][0] / (matrix[0][0] + matrix[0][1])
+    return matrix, tasa_falsos_positivos, tasa_verdaderos_postivos
 
 
 def plot_roc(individual_classifications: dict):
@@ -94,7 +94,7 @@ def get_index(category):
         return 3
 
 
-def accurancy(confusion_matrix):
+def accuracy(confusion_matrix):
     correct = sum([confusion_matrix[i][i] for i in range(len(confusion_matrix))])
     total = sum(sum(confusion_matrix))
     result = correct / total

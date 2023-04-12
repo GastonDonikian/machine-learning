@@ -8,7 +8,7 @@ import numpy as np
 from collections import defaultdict
 
 iterations = 10
-SEED = 2023
+SEED = 212341233
 random.seed(SEED)
 
 categories = ['Nacional', 'Economia', 'Deportes', 'Salud']
@@ -27,9 +27,11 @@ def filterUselessWordsAndTokenized(data):
                     "hasta", "mediante", "para", "por", "según",
                     "sin", "so", "sobre", "tras"]
     extra = ["que", "su", "se", "fue", "como", '|']
-    data = data.lower()
+
     punctuations = ['!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+', ',', '-', '.', '/', ':', ';', '<', '=', '>',
                     '?', '@', '[', '\\', ']', '^', '_', '`', '{', '|', '}', '~', '¡', '¿']
+
+    data = data.lower()
     tokenized_data = re.split('\W+', data)
     return list(filter(lambda x: x.lower() not in articles and
                                  x.lower() not in prepositions and
@@ -220,15 +222,15 @@ def main():
     confusion_matrix_expanded = metrics.confusion_matrix(categories, expected, predicted)
 
     for category in categories:
-        confusion_matrix, tasa_falsos_positivos, tasa_falsos_negativos = metrics.confusion_matrix_by_category(category, expected, predicted)
-        print(confusion_matrix)
-        accurancy = metrics.accurancy(confusion_matrix)
+        confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(category, expected, predicted)
+        print("Category " + str(category) + ": " + str(confusion_matrix))
+        accuracy = metrics.accuracy(confusion_matrix)
         precision = metrics.precision(confusion_matrix)
         f1 = metrics.F1_score(confusion_matrix)
-        print(category)
-        print(accurancy)
-        print(precision)
-        print(f1)
+        print("Category " + str(category) + ": { Falsos positivos: " + str(tasa_falsos_positivos) + "\n Verdaderos positivos: " + str(tasa_verdaderos_postivos) + "\n F1: " + str(f1)+ "\n precision: " + str(precision)
+              + "\n accuracy: " + str(accuracy) )
+        # print(precision)
+        # print(f1)
 
 
 if __name__ == "__main__":
