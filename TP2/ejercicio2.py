@@ -26,14 +26,15 @@ def preprocess_array(arr):
     return variables
 
 
+# classified_array:: (actual, knn, weighted knn)
 def exercise_c(train, test):
     train_variables = preprocess_array(train)
     test_variables = preprocess_array(test)
-    k_nearest = return_k_nearest(5, train_variables, test_variables[0][1])
-    print("Classify: " + str(test_variables[0][1]))
-    print("Weighted example: " + str(classify_weighted_neighbours(k_nearest))
-          + " Unweighted example: " + str(classify_neighbours(k_nearest)))
-
+    classified_array = []
+    for i in test_variables:
+        k_nearest = return_k_nearest(5, train_variables, i[1])
+        classified_array.append((i[0], classify_neighbours(k_nearest), classify_weighted_neighbours(k_nearest)))
+    return classified_array
 
 # data_array:: (a,(b,c,d))
 # value:: (b,c,d)
@@ -57,7 +58,8 @@ def classify_weighted_neighbours(k_neighbours):
     count_dict = {}
     for j in k_neighbours:
         if j[0] not in count_dict: count_dict[j[0]] = 0
-        count_dict[j[0]] += 1 / j[1]
+        if j[1] != 0:
+            count_dict[j[0]] += 1 / j[1]
     return max(count_dict)
 
 
@@ -73,7 +75,7 @@ def main():
     data_frame = pd.read_csv('./resources/reviews_sentiment.csv', delimiter=';')
     # print("Average word count for ratings of 1: " + str(round(exercise_a(data_frame), 2)))
     train, test = exercise_b(data_frame)
-    exercise_c(train=train, test=test)
+    print(exercise_c(train=train, test=test)[:10])
 
 
 if __name__ == "__main__":
