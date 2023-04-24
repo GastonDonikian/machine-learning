@@ -42,6 +42,15 @@ class Node:
     
     def get_attribute(self):
         return self.attribute
+    
+    def append_desc(self, node):
+        self.descendants.append(node)
+    
+    def __repr__(self):
+        return "desc_list:% s value:% s Attribute:% s" % (self.descendants, self.value, self.attribute) 
+
+    def __str__(self): 
+        return "desc_list:% s value:% s Attribute:% s" % (self.descendants, self.value, self.attribute) 
 
 
 def entropy(probabilities):
@@ -87,9 +96,7 @@ def get_max_gain(training, attributes, values, father):
     attribute_max_gain = ""
     father_g = 0
     entropies = []
-    print(attributes)
     if father is not None:
-        print(father.attribute)
         father_g = father.get_entropy()
     else:
         probabilities = []
@@ -97,7 +104,6 @@ def get_max_gain(training, attributes, values, father):
         probabilities.append(crediatability_filter.shape[0]/training.shape[0])
         probabilities.append((training.shape[0]-crediatability_filter.shape[0])/training.shape[0])
         father_g = entropy(probabilities)
-        print(father_g)
 
 
     for attribute in attributes:
@@ -135,13 +141,16 @@ def id3(training, attributes, values, father):
     for idx,value in enumerate(values[attribute_max_gain]):
         new_node = Node([],value,entropies[idx],attribute_max_gain)
         if father is not None:
-            father.descendants.append(new_node)
+            father.append_desc(new_node)
+        else:
+            father = new_node
         training_filter = training.loc[training[attribute_max_gain] == value]
         new_attributes = attributes.copy()
         new_attributes.remove(attribute_max_gain)
         new_val = values.copy()
         new_val.pop(attribute_max_gain)
         id3(training_filter,new_attributes,new_val,new_node)
+
 
     return father
 
@@ -179,8 +188,6 @@ if __name__ == "__main__":
     data = replaces_process_data(data, 'Age (years)', 3)
 
     attributes.remove(creditability)
-    print(attributes)
-    print("------")
     values_per_atr = {}
     for atr in attributes :
         values_per_atr[atr] = data[atr].unique()
@@ -192,7 +199,6 @@ if __name__ == "__main__":
     for j in range(1, 10):
          training = pd.concat([training, df_list[j]], axis=0)
 
-    print("MAIN")
 
     print(id3(data,attributes,values_per_atr,None))
     
