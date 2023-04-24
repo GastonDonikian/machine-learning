@@ -36,8 +36,13 @@ def confusion_matrix_by_category(category, predicted, expected):
                 matrix[0][1] += 1
             else:
                 matrix[1][0] += 1
-    tasa_falsos_positivos = matrix[0][1] / (matrix[0][0] + matrix[0][1])
-    tasa_verdaderos_postivos = matrix[0][0] / (matrix[0][0] + matrix[0][1])
+    denominator = matrix[0][0] + matrix[0][1]
+    tasa_falsos_positivos = 0
+    tasa_verdaderos_postivos = 0
+    if denominator != 0:
+        tasa_falsos_positivos = matrix[0][1] / (denominator)
+        tasa_verdaderos_postivos = matrix[0][0] / (denominator)
+        
     return matrix, tasa_falsos_positivos, tasa_verdaderos_postivos
 
 

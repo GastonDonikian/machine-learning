@@ -42,9 +42,9 @@ def exercise_c(train, test):
 def return_k_nearest(k: int, data_array, value):
     # x[1] -> (b,c,d)
     euclidean_array = list(map(lambda x: (x[0], euclidean_distance(x[1], value)), data_array))
-    return sorted(euclidean_array, key=lambda x: x[1])[:k]
+    return sorted(euclidean_array, key=lambda x: x[1])[:k] 
 
-
+##return the most common class of the k_netbours counting them
 def classify_neighbours(k_neighbours):
     count_dict = {}
     for j in k_neighbours:
@@ -53,7 +53,7 @@ def classify_neighbours(k_neighbours):
         count_dict[j[0]] += 1
     return max(count_dict)
 
-
+##return the class with the highest weighted score of the k_netbours 
 def classify_weighted_neighbours(k_neighbours):
     count_dict = {}
     for j in k_neighbours:
@@ -71,11 +71,32 @@ def euclidean_distance(a, b):
     return pow(ans, 1 / 2)
 
 
+
+def exercise_d(train, test):
+    train_variables = preprocess_array(train)
+    test_variables = preprocess_array(test)
+    expected = []
+    predicted = []
+    for i in test_variables:
+        k_nearest = return_k_nearest(5, train_variables, i[1])
+        expected.append(i[0])
+        predicted.append(classify_weighted_neighbours(k_nearest))
+    
+    for i in range(1,6):
+        confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(i, expected, predicted)
+        print("category: " + str(i))
+        print(confusion_matrix)
+        print(tasa_falsos_positivos)
+        print(tasa_verdaderos_postivos)
+    
+
+
 def main():
     data_frame = pd.read_csv('./resources/reviews_sentiment.csv', delimiter=';')
     # print("Average word count for ratings of 1: " + str(round(exercise_a(data_frame), 2)))
     train, test = exercise_b(data_frame)
     print(exercise_c(train=train, test=test)[:10])
+    exercise_d(train=train, test=test)
 
 
 if __name__ == "__main__":
