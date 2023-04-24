@@ -22,10 +22,11 @@ def preprocessing(data_frame, name, parts):
 
 
 class Node:
-    def __init__(self, desc_list, value, entropy):
+    def __init__(self, desc_list, value, entropy, attribute):
         self.descendants = desc_list
         self.entropy = entropy
         self.value = value
+        self.attribute = attribute
 
     def get_descendant(self, i: int):
         return self.descendants[i]
@@ -38,6 +39,9 @@ class Node:
     
     def get_entropy(self):
         return self.entropy
+    
+    def get_attribute(self):
+        return self.attribute
 
 
 def entropy(probabilities):
@@ -49,9 +53,6 @@ def entropy(probabilities):
     
 
 def gain(relative_probs_value, values,g):
-    
-    print("relative props")
-    print(relative_probs_value)
     entropies = []
     for value in values:
         e= entropy(relative_probs_value.get(value)[1:])
@@ -61,73 +62,78 @@ def gain(relative_probs_value, values,g):
     return g, entropies
     
 
+def calculate_probability(training_filter,training):
+      if training == 0:
+          return 0
+      else:
+          return training_filter/training
+
+
 def set_probabilities(training,attr_name,values):
     relative_probs_value = {}
     for value in values:
         training_filter = training.loc[training[attr_name] == value]
         relative_probs_value[value] = []
-        size = training.shape[0]
-        if size == 0:
-            relative_probs_value[value].append(0)
-        else:
-            relative_probs_value[value].append(((training_filter).shape[0])/size) 
         crediatability_filter = training_filter.loc[training[creditability] == 0]
-        size = training_filter.shape[0]
-        if size == 0:
-            relative_probs_value[value].append(0)
-            relative_probs_value[value].append(0)
-        else: 
-            relative_probs_value[value].append(crediatability_filter.shape[0]/size)
-            relative_probs_value[value].append((training_filter.shape[0]-crediatability_filter.shape[0])/size)
+        relative_probs_value[value].append(calculate_probability(training_filter.shape[0],training.shape[0]))
+        relative_probs_value[value].append(calculate_probability(crediatability_filter.shape[0],training_filter.shape[0]))
+        relative_probs_value[value].append(calculate_probability(training_filter.shape[0]-crediatability_filter.shape[0],training_filter.shape[0]))
     return relative_probs_value
 
-def get_criteria_probabilities(data_array, value):
-    return data_array.count(value)/len(data_array)
 
 
 def get_max_gain(training, attributes, values, father):
     max_gain = 0
     attribute_max_gain = ""
-    g = 0
+    father_g = 0
     entropies = []
+    print(attributes)
     if father is not None:
-        g = father.get_entropy()
+        print(father.attribute)
+        father_g = father.get_entropy()
     else:
         probabilities = []
         crediatability_filter = training.loc[training[creditability] == 0]
         probabilities.append(crediatability_filter.shape[0]/training.shape[0])
         probabilities.append((training.shape[0]-crediatability_filter.shape[0])/training.shape[0])
-        g = entropy(probabilities)
+        father_g = entropy(probabilities)
+        print(father_g)
 
 
     for attribute in attributes:
         relative_probs_value = set_probabilities(training,attribute, values[attribute])
-        g, e = gain(relative_probs_value,values[attribute], g)
-        print(attribute)
-        print(max_gain)
-        print(g)
-        if max_gain < g:
+        g, e = gain(relative_probs_value,values[attribute], father_g)
+        if max_gain <= g:
             max_gain = g
             attribute_max_gain = attribute
-            entropies = e
-
-    print("ATTRIBUTE MAX GAIN " + attribute_max_gain)
+            entropies = e  
     return attribute_max_gain, entropies
 
+def check_tree(training):
+    crediatability_filter = training.loc[training[creditability] == 0]
+    size = crediatability_filter.shape[0]
+    if size == 0: 
+        new_node = Node([],"1",[])
+        return new_node
+    elif size == training.shape[0]:
+        new_node = Node([],"0",[])
+        return new_node
+    else:
+        return None
 
 def id3(training, attributes, values, father):
        
-    if len(attributes) == 0:
+    if len(attributes) == 0 or len(values) == 0 or len(training) == 0:
         return father
-    
+
+    if father is None:
+        n = check_tree(training)
+        if n is not None:
+            return n
     
     attribute_max_gain, entropies = get_max_gain(training, attributes, values, father)
-
-    print("ID3")
-    print(attribute_max_gain)
-    print(entropies) ##ta dando raro esto
     for idx,value in enumerate(values[attribute_max_gain]):
-        new_node = Node([],value,entropies[idx])
+        new_node = Node([],value,entropies[idx],attribute_max_gain)
         if father is not None:
             father.descendants.append(new_node)
         training_filter = training.loc[training[attribute_max_gain] == value]
