@@ -22,10 +22,11 @@ def preprocessing(data_frame, name, parts):
 
 
 class Node:
-    def __init__(self, desc_list, value, entropy, attribute):
+    def __init__(self, desc_list, value, entropy, gain, attribute):
         self.descendants = desc_list
         self.entropy = entropy
         self.value = value
+        self.gain = gain
         self.attribute = attribute
 
     def get_descendant(self, i: int):
@@ -45,6 +46,9 @@ class Node:
     
     def append_desc(self, node):
         self.descendants.append(node)
+
+    def get_gain(self):
+        return self.gain
     
     def __repr__(self):
         return "desc_list:% s value:% s Attribute:% s" % (self.descendants, self.value, self.attribute) 
@@ -94,8 +98,20 @@ def set_probabilities(training,attr_name,values):
 def get_max_gain(training, attributes, values, father):
     max_gain = 0
     attribute_max_gain = ""
-    father_g = 0
     entropies = []
+
+    for attribute in attributes:
+        relative_probs_value = set_probabilities(training,attribute, values[attribute])
+        g, e = calculate_gain_and_entropy(training,attribute,values[attribute],father)
+        if max_gain <= g:
+            max_gain = g
+            attribute_max_gain = attribute
+            entropies = e  
+    return attribute_max_gain, entropies, max_gain
+
+
+def calculate_gain_and_entropy(training,attribute,value,father):
+    
     if father is not None and father.value is not None:
         father_g = father.get_entropy()
     else:
@@ -105,24 +121,32 @@ def get_max_gain(training, attributes, values, father):
         probabilities.append((training.shape[0]-crediatability_filter.shape[0])/training.shape[0])
         father_g = entropy(probabilities)
 
+    relative_probs_value = set_probabilities(training,attribute, value)
+    g, e = gain(relative_probs_value,value, father_g)
 
-    for attribute in attributes:
-        relative_probs_value = set_probabilities(training,attribute, values[attribute])
-        g, e = gain(relative_probs_value,values[attribute], father_g)
-        if max_gain <= g:
-            max_gain = g
-            attribute_max_gain = attribute
-            entropies = e  
-    return attribute_max_gain, entropies
+    return g, e
 
+def finish_tree(training,node,father):
+    new_node = check_tree(training)
+    if new_node is not None:
+        node.append_desc(new_node)
+    else:
+        gain, entropies = calculate_gain_and_entropy(training,creditability,["0","1"],father)
+        node_cred_0 =  Node([],"0",entropies[0],gain,creditability)
+        node.append_desc(node_cred_0)
+        node_cred_1 =  Node([],"1",entropies[0],gain,creditability)
+        node.append_desc(node_cred_1)
+
+
+#@profile
 def check_tree(training):
     crediatability_filter = training.loc[training[creditability] == 0]
     size = crediatability_filter.shape[0]
     if size == 0: 
-        new_node = Node([],"1",[])
+        new_node = Node([],"1",None,None,creditability)
         return new_node
     elif size == training.shape[0]:
-        new_node = Node([],"0",[])
+        new_node = Node([],"0",None,None,creditability)
         return new_node
     else:
         return None
@@ -138,11 +162,11 @@ def id3(training, attributes, values, father, max):
         n = check_tree(training)
         if n is not None:
             return n
-        father = Node([],None,None,None)
+        father = Node([],None,None,None,None)
     max -= 1
-    attribute_max_gain, entropies = get_max_gain(training, attributes, values, father)
+    attribute_max_gain, entropies, gain = get_max_gain(training, attributes, values, father)
     for idx,value in enumerate(values[attribute_max_gain]):
-        new_node = Node([],value,entropies[idx],attribute_max_gain)
+        new_node = Node([],value,entropies[idx],gain,attribute_max_gain)
         training_filter = training.loc[training[attribute_max_gain] == value]
         new_attributes = attributes.copy()
         new_attributes.remove(attribute_max_gain)
@@ -151,6 +175,8 @@ def id3(training, attributes, values, father, max):
         father.append_desc(new_node)
         if max > 0:
             id3(training_filter,new_attributes,new_val,new_node,max)
+        else:
+            finish_tree(training,new_node,father)
         
 
 
