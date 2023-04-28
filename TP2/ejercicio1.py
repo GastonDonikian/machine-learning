@@ -90,13 +90,13 @@ def set_probabilities(training,attr_name,values):
     return relative_probs_value
 
 
-
+#@profile
 def get_max_gain(training, attributes, values, father):
     max_gain = 0
     attribute_max_gain = ""
     father_g = 0
     entropies = []
-    if father is not None:
+    if father is not None and father.value is not None:
         father_g = father.get_entropy()
     else:
         probabilities = []
@@ -126,8 +126,10 @@ def check_tree(training):
         return new_node
     else:
         return None
+    
 
-def id3(training, attributes, values, father):
+#@profile
+def id3(training, attributes, values, father, max):
        
     if len(attributes) == 0 or len(values) == 0 or len(training) == 0:
         return father
@@ -136,20 +138,20 @@ def id3(training, attributes, values, father):
         n = check_tree(training)
         if n is not None:
             return n
-    
+        father = Node([],None,None,None)
+    max -= 1
     attribute_max_gain, entropies = get_max_gain(training, attributes, values, father)
     for idx,value in enumerate(values[attribute_max_gain]):
         new_node = Node([],value,entropies[idx],attribute_max_gain)
-        if father is not None:
-            father.append_desc(new_node)
-        else:
-            father = new_node
         training_filter = training.loc[training[attribute_max_gain] == value]
         new_attributes = attributes.copy()
         new_attributes.remove(attribute_max_gain)
         new_val = values.copy()
         new_val.pop(attribute_max_gain)
-        id3(training_filter,new_attributes,new_val,new_node)
+        father.append_desc(new_node)
+        if max > 0:
+            id3(training_filter,new_attributes,new_val,new_node,max)
+        
 
 
     return father
@@ -200,5 +202,5 @@ if __name__ == "__main__":
          training = pd.concat([training, df_list[j]], axis=0)
 
 
-    print(id3(data,attributes,values_per_atr,None))
+    print(id3(data,attributes,values_per_atr,None,2))
     
