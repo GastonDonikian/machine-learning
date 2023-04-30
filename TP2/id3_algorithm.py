@@ -180,9 +180,13 @@ def finish_tree(training,node):
     size_1 = 1 - training.shape[0]
     if size_0 > size_1:
         node_cred_0 =  Node([],0,None,None,creditability)
+        if node is not None:
+            node.moda = 0
         node.append_desc(node_cred_0)
     else:    
         node_cred_1 =  Node([],1,None,None,creditability)
+        if node is not None:
+            node.moda = 1
         node.append_desc(node_cred_1)
 
 
@@ -193,6 +197,7 @@ def check_tree(training, node, filter_min_data = None):
 
     if filter_min_data is not None and size <= filter_min_data:
         finish_tree(training,node)
+        return node
         
     if size_0 == 0: 
         new_node = Node([],1,None,None,creditability)
@@ -216,10 +221,12 @@ def id3(training, attributes, values, father, max, filter_min_data , filter_gain
         return father
 
     if father is None:
-        n = check_tree(training, None)
-        if n is not None:
-            return n
         father = Node([],None,None,None,None)
+        n = check_tree(training, father)
+        if n is not None:
+            father.append_desc(n)
+            return father
+        
     if max is not None: max -= 1
     
     probability_dict_attribute,father_g = get_probabilities_and_father_g(training, attributes, values, father)

@@ -8,6 +8,7 @@ import metrics
 import numpy as np
 import math
 import id3_algorithm
+import randomForest
 from collections import defaultdict
 
 creditability = 'Creditability'
@@ -61,7 +62,28 @@ def classify_input(row, father):
                     change = True
 
         if change == False:
-            return  father.moda
+            classify = father.moda
+            return classify
+
+
+
+
+def expected(test):
+    expected = []
+
+    for index, row in test.iterrows():
+        expected.append(row[creditability])
+    
+    return expected
+
+def predicted(test, father):
+    predicted = []
+
+    for index, row in test.iterrows():
+        classify = classify_input(row,father)
+        predicted.append(classify)
+
+    return predicted
 
 
 def resolve_test(test,father):
@@ -76,8 +98,27 @@ def resolve_test(test,father):
     print(confusion_matrix)
     print(tasa_falsos_positivos)
     print(tasa_verdaderos_postivos)
-    print(metrics.accuracy(confusion_matrix))
+    return metrics.accuracy(confusion_matrix)
     
+
+def resolve_random_forest(dict_predicted, expected_results):
+    predicted = []
+    for index, value in enumerate(expected_results):
+        result = dict_predicted[index]
+        count_0 = result[0]
+        count_1 = result[1]
+        if count_1 > count_0:
+            predicted.append(1)
+        else:
+            predicted.append(0)
+    
+    confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(creditability_values[1], expected_results, predicted)
+    print(confusion_matrix)
+    print(tasa_falsos_positivos)
+    print(tasa_verdaderos_postivos)
+    print(metrics.accuracy(confusion_matrix))
+    return metrics.accuracy(confusion_matrix)
+
 
 
 def main():
@@ -96,14 +137,33 @@ def main():
          training = pd.concat([training, df_list[j]], axis=0)
 
     attributes.remove(creditability)
-    values_per_atr = {}
-    for atr in attributes :
-        values_per_atr[atr] = training[atr].unique()
+    #values_per_atr = {}
 
 
-    father = id3_algorithm.id3(training,attributes,values_per_atr,None, None,None,None) #tree of the training
+    #execute ID3
+    #for atr in attributes : 
+    #    values_per_atr[atr] = training[atr].unique()
+
+
+    #father = id3_algorithm.id3(training,attributes,values_per_atr,None, None,None,None) #tree of the training
  
-    resolve_test(test, father)
+    #resolve_test(test, father)
+
+    fathers = randomForest.random_forest(training,attributes,10,None,None,None)
+    dict_predicted = {}
+    for index, row in test.iterrows():
+        dict_predicted[index] = {item: 0 for item in creditability_values}
+
+    for father in fathers:
+        pred = predicted(test, father)
+
+        for index, value in enumerate(pred):
+            dict_predicted[index][value] += 1
+
+    expected_result = expected(test)
+
+    resolve_random_forest(dict_predicted,expected_result)
+
    
 if __name__ == "__main__":
     main() 

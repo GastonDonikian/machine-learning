@@ -4,7 +4,7 @@ import copy
 import random
 import matplotlib.pyplot as plt
 iterations = 10
-SEED = 2017
+SEED = 5017
 random.seed(SEED)
 
 
@@ -16,6 +16,16 @@ random.seed(SEED)
 #        test = dataset.iloc[test_indices].reset_index(drop=True)
 #        train = dataset.drop(test_indices).reset_index(drop=True)
 #    return train, test
+
+
+def bagging(dataset, k):
+    df_list = []
+    split_size = int(dataset.shape[0]/k)
+    for i in range(k):
+        df_list.append(dataset.sample(random_state=SEED, n=k, replace=True) )
+
+    return df_list
+
 
 def cross_validation(dataset, k):
     dataset = dataset.sample(frac=1, random_state=SEED).reset_index(drop=True)
