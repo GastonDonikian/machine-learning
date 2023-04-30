@@ -77,24 +77,24 @@ def expected(test):
     return expected
 
 def predicted(test, father):
-    predicted = []
+    predicted_result = []
 
     for index, row in test.iterrows():
         classify = classify_input(row,father)
-        predicted.append(classify)
+        predicted_result.append(classify)
 
-    return predicted
+    return predicted_result
 
 
 def resolve_test(test,father):
-    expected = []
-    predicted = []
+    expected_result = []
+    predicted_result = []
 
     for index, row in test.iterrows():
-        expected.append(row[creditability])
-        predicted.append(classify_input(row,father))
+        expected_result.append(row[creditability])
+        predicted_result.append(classify_input(row,father))
         
-    confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(creditability_values[1], expected, predicted)
+    confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(creditability_values[1], expected_result, predicted_result)
     print(confusion_matrix)
     print(tasa_falsos_positivos)
     print(tasa_verdaderos_postivos)
@@ -103,6 +103,7 @@ def resolve_test(test,father):
 
 def resolve_random_forest(dict_predicted, expected_results):
     predicted = []
+
     for index, value in enumerate(expected_results):
         result = dict_predicted[index]
         count_0 = result[0]
@@ -149,7 +150,7 @@ def main():
  
     #resolve_test(test, father)
 
-    fathers = randomForest.random_forest(training,attributes,10,None,None,None)
+    fathers = randomForest.random_forest(training,attributes,1,None,1,None,0.83)
     dict_predicted = {}
     for index, row in test.iterrows():
         dict_predicted[index] = {item: 0 for item in creditability_values}

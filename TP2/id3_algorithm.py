@@ -190,39 +190,44 @@ def finish_tree(training,node):
         node.append_desc(node_cred_1)
 
 
-def check_tree(training, node, filter_min_data = None):
+def check_tree(training, node, filter_min_data, filter_probability):
     crediatability_filter = training.loc[training[creditability] == 0]
     size_0 = crediatability_filter.shape[0]
+    size_1 = training.shape[0] - size_0
     size = training.shape[0]
+    prob_0 = 0
+    prob_1 = 0
+    if size != 0:
+        prob_0 = size_0/size
+        prob_1 = size_1/size
 
     if filter_min_data is not None and size <= filter_min_data:
         finish_tree(training,node)
         return node
         
-    if size_0 == 0: 
+    if size_0 == 0 or (filter_probability is not None and prob_1 >= filter_probability): 
         new_node = Node([],1,None,None,creditability)
         if node is not None:
             node.moda = 1
         return new_node
-    elif size_0 == training.shape[0]:
+    elif size_0 == training.shape[0] or (filter_probability is not None and prob_0 >= filter_probability):
         new_node = Node([],0,None,None,creditability)
         if node is not None:
             node.moda = 0
         return new_node
     else:
         if node is not None:
-            size_1 = training.shape[0] - size_0
             node.moda = 0 if size_0 > size_1 else 1 
         return None
     
-def id3(training, attributes, values, father, max, filter_min_data , filter_gain):
+def id3(training, attributes, values, father, max, filter_min_data , filter_gain, filter_probability):
        
     if len(attributes) == 0 or len(values) == 0 or len(training) == 0:
         return father
 
     if father is None:
         father = Node([],None,None,None,None)
-        n = check_tree(training, father)
+        n = check_tree(training, father, None, None)
         if n is not None:
             father.append_desc(n)
             return father
@@ -241,7 +246,7 @@ def id3(training, attributes, values, father, max, filter_min_data , filter_gain
         father.append_desc(new_node)
         mask = training[attribute_max_gain] == value
         training_filter = training[mask]
-        node_leaf = check_tree(training_filter, new_node, filter_min_data)
+        node_leaf = check_tree(training_filter, new_node, filter_min_data, filter_probability)
         if node_leaf is not None:
             new_node.append_desc(node_leaf)
         else:
@@ -251,7 +256,7 @@ def id3(training, attributes, values, father, max, filter_min_data , filter_gain
             new_val.pop(attribute_max_gain)
         
             if (max is None and new_attributes is not None ) or ( max > 0):
-                id3(training_filter,new_attributes,new_val,new_node,max,filter_min_data,filter_gain)
+                id3(training_filter,new_attributes,new_val,new_node,max,filter_min_data,filter_gain, filter_probability)
             else:
                 finish_tree(training, new_node)
 
