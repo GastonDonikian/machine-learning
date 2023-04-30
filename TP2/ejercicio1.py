@@ -32,6 +32,7 @@ class Node:
         self.value = value
         self.gain = gain
         self.attribute = attribute
+        self.moda = None
 
     def get_descendant(self, i: int):
         return self.descendants[i]
@@ -50,6 +51,7 @@ class Node:
     
     def append_desc(self, node):
         self.descendants.append(node)
+
 
     def get_gain(self):
         return self.gain
@@ -181,37 +183,44 @@ def calculate_gain_and_entropy(training,attribute,value,father):
 
     return g, e
 
-def finish_tree(training,node,father):
-    new_node = check_tree(training)
-    if new_node is not None:
-        node.append_desc(new_node)
-    else:
-        gain, entropies = calculate_gain_and_entropy(training,creditability,creditability_values,father)
-        node_cred_0 =  Node([],0,entropies[0],gain,creditability)
+def finish_tree(training,node):
+    crediatability_filter = training.loc[training[creditability] == 0]
+    size_0 = crediatability_filter.shape[0]
+    size_1 = 1 - training.shape[0]
+    if size_0 > size_1:
+        node_cred_0 =  Node([],0,None,None,creditability)
         node.append_desc(node_cred_0)
-        node_cred_1 =  Node([],1,entropies[0],gain,creditability)
+    else:    
+        node_cred_1 =  Node([],1,None,None,creditability)
         node.append_desc(node_cred_1)
 
 
-def check_tree(training):
+def check_tree(training, node):
     crediatability_filter = training.loc[training[creditability] == 0]
-    size = crediatability_filter.shape[0]
-    if size == 0: 
+    size_0 = crediatability_filter.shape[0]
+    if size_0 == 0: 
         new_node = Node([],1,None,None,creditability)
+        if node is not None:
+            node.moda = 1
         return new_node
-    elif size == training.shape[0]:
+    elif size_0 == training.shape[0]:
         new_node = Node([],0,None,None,creditability)
+        if node is not None:
+            node.moda = 0
         return new_node
     else:
+        if node is not None:
+            size_1 = training.shape[0] - size_0
+            node.moda = 0 if size_0 > size_1 else 1 
         return None
     
-def id3(training, attributes, values, father, max):
+def id3(training, attributes, values, father, max=None):
        
     if len(attributes) == 0 or len(values) == 0 or len(training) == 0:
         return father
 
     if father is None:
-        n = check_tree(training)
+        n = check_tree(training, None)
         if n is not None:
             return n
         father = Node([],None,None,None,None)
@@ -221,17 +230,22 @@ def id3(training, attributes, values, father, max):
     attribute_max_gain, entropies, gain = calculate_max_gain_and_entropies(probability_dict_attribute,father_g,training.shape[0])
     for idx,value in enumerate(values[attribute_max_gain]):
         new_node = Node([],value,entropies[idx],gain,attribute_max_gain)
-        training_filter = training.loc[training[attribute_max_gain] == value]
-        new_attributes = attributes.copy()
-        new_attributes.remove(attribute_max_gain)
-        new_val = values.copy()
-        new_val.pop(attribute_max_gain)
         father.append_desc(new_node)
-        if (max is None and new_attributes is not None ) or ( max > 0):
-            id3(training_filter,new_attributes,new_val,new_node,max)
+        mask = training[attribute_max_gain] == value
+        training_filter = training[mask]
+        node_leaf = check_tree(training_filter, new_node)
+        if node_leaf is not None:
+            new_node.append_desc(node_leaf)
         else:
-            finish_tree(training,new_node,father)
+            new_attributes = attributes.copy()
+            new_attributes.remove(attribute_max_gain)
+            new_val = values.copy()
+            new_val.pop(attribute_max_gain)
         
+            if (max is None and new_attributes is not None ) or ( max > 0):
+                id3(training_filter,new_attributes,new_val,new_node,max)
+            else:
+                finish_tree(training, new_node)
 
 
     return father
@@ -261,6 +275,41 @@ def replaces_process_data(data, name, parts):
     return data
 
 
+def classify_input(row, father):
+    found = False
+    clasify = None
+    while not found:
+        change = False
+        desc = father.descendants
+        for node in desc:
+            if node.attribute == creditability:
+                    clasify = node.value
+                    return clasify
+            else:
+                if node.value == row[node.attribute]:
+                    father = node
+                    change = True
+            if change == False:
+                clasify = father.moda
+                return clasify
+    return clasify
+
+
+def resolve_test(test,father):
+    expected = []
+    predicted = []
+
+    for index, row in test.iterrows():
+        expected.append(row[creditability])
+        predicted.append(classify_input(row,father))
+        
+    confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(creditability_values[0], expected, predicted)
+    print(confusion_matrix)
+    print(tasa_falsos_positivos)
+    print(tasa_verdaderos_postivos)
+    
+
+
 def main():
     data = pd.read_csv('./resources/german_credit.csv')
     attributes = list(data.head(0))
@@ -268,21 +317,31 @@ def main():
     data = replaces_process_data(data, 'Credit Amount', 3)
     data = replaces_process_data(data, 'Age (years)', 3)
 
+   
+    partition = 10
+    df_list = metrics.cross_validation(data, partition)
+    test = df_list[0]
+    training = pd.DataFrame()
+    for j in range(1, partition):
+         training = pd.concat([training, df_list[j]], axis=0)
+
+    #row = training.iloc[1].copy()
+    #row[creditability] = 1 - row[creditability]
+
+    #training.loc[len(training.index)] = row 
+    #print(training.tail(5))
+    #print(training)
+
     attributes.remove(creditability)
     values_per_atr = {}
     for atr in attributes :
-        values_per_atr[atr] = data[atr].unique()
+        values_per_atr[atr] = training[atr].unique()
 
 
-    df_list = metrics.cross_validation(data, 10)
-    test = df_list[0]
-    training = pd.DataFrame()
-    for j in range(1, 10):
-         training = pd.concat([training, df_list[j]], axis=0)
-
-
-    father = id3(data,attributes,values_per_atr,None,None)
-    print(father)
+    father = id3(training,attributes,values_per_atr,None,None) #tree of the training
+    resolve_test(training,father)
+   
+    #print(father)
 
 if __name__ == "__main__":
     main() 
