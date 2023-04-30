@@ -10,6 +10,10 @@ iterations = 10
 # SEED = 2023
 # random.seed(SEED)
 
+SEED = 50000000
+random.seed(SEED)
+
+
 
 # def cross_validation(dataset, k):
 #    n = int(len(dataset) / k)
@@ -20,8 +24,22 @@ iterations = 10
 #        train = dataset.drop(test_indices).reset_index(drop=True)
 #    return train, test
 
+
+def bagging(dataset, k):
+    df_list = []
+    split_size = int(dataset.shape[0]/k)
+    for i in range(k):
+        df_list.append(dataset.sample( random_state=SEED,n=split_size, replace=True).reset_index(drop=True) )
+    
+    return df_list
+
+
 def cross_validation(dataset, k):
-    # dataset = dataset.sample(frac=1, random_state=SEED).reset_index(drop=True)
+    dataset = dataset.sample(frac=1, random_state=SEED).reset_index(drop=True)
+    df_list = np.array_split(dataset, k)
+    return df_list
+
+def cross_validation_for_2(dataset, k):
     dataset = dataset.dropna()
     dataset = dataset.sample(frac=1).reset_index(drop=True)
     df_list = np.array_split(dataset, k)

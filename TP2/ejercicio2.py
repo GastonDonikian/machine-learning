@@ -11,7 +11,7 @@ def exercise_a(data_frame):
 
 
 def exercise_b(data_frame):
-    df_list = metrics.cross_validation(data_frame, 5)
+    df_list = metrics.cross_validation_for_2(data_frame, 5)
     train = pd.concat([df_list[1], df_list[2], df_list[3], df_list[4]], axis=0)
     test = df_list[0]
     return train, test
