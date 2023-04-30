@@ -9,7 +9,10 @@ import numpy as np
 import math
 from collections import defaultdict
 
-creditability = "Creditability"
+creditability = 'Creditability'
+creditability_values = [0, 1]
+
+
 
 def preprocessing(data_frame, name, parts):
     data = data_frame[name].to_numpy()
@@ -278,7 +281,7 @@ def main():
          training = pd.concat([training, df_list[j]], axis=0)
 
 
-    father = id3(data,attributes,values_per_atr,None,2)
+    father = id3(data,attributes,values_per_atr,None,None)
     print(father)
 
 if __name__ == "__main__":
