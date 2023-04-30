@@ -72,10 +72,11 @@ def resolve_test(test,father):
         expected.append(row[creditability])
         predicted.append(classify_input(row,father))
         
-    confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(creditability_values[0], expected, predicted)
+    confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(creditability_values[1], expected, predicted)
     print(confusion_matrix)
     print(tasa_falsos_positivos)
     print(tasa_verdaderos_postivos)
+    print(metrics.accuracy(confusion_matrix))
     
 
 
@@ -83,23 +84,16 @@ def main():
     data = pd.read_csv('./resources/german_credit.csv')
     attributes = list(data.head(0))
     data = replaces_process_data(data, 'Duration of Credit (month)', 3)
-    data = replaces_process_data(data, 'Credit Amount', 3)
-    data = replaces_process_data(data, 'Age (years)', 3)
+    data = replaces_process_data(data, 'Credit Amount', 4)
+    data = replaces_process_data(data, 'Age (years)', 5)
 
    
-    partition = 2
+    partition = 5
     df_list = metrics.cross_validation(data, partition)
     test = df_list[0]
     training = pd.DataFrame()
     for j in range(1, partition):
          training = pd.concat([training, df_list[j]], axis=0)
-
-    row = training.iloc[1].copy()
-    row[creditability] = 1 - row[creditability]
-
-    training.loc[len(training.index)] = row 
-    print(training.tail(5))
-
 
     attributes.remove(creditability)
     values_per_atr = {}
@@ -107,11 +101,9 @@ def main():
         values_per_atr[atr] = training[atr].unique()
 
 
-    father = id3_algorithm.id3(training,attributes,values_per_atr,None,None) #tree of the training
-    print(father)
-    resolve_test(training,father)
+    father = id3_algorithm.id3(training,attributes,values_per_atr,None, None,None,None) #tree of the training
+ 
+    resolve_test(test, father)
    
-    #print(father)
-
 if __name__ == "__main__":
     main() 

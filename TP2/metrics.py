@@ -4,7 +4,7 @@ import copy
 import random
 import matplotlib.pyplot as plt
 iterations = 10
-SEED = 2023
+SEED = 2017
 random.seed(SEED)
 
 
