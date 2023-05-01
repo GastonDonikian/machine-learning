@@ -4,7 +4,7 @@ import copy
 import random
 import matplotlib.pyplot as plt
 iterations = 10
-SEED = 50000000
+SEED = 5017
 random.seed(SEED)
 
 

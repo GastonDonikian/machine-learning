@@ -13,7 +13,7 @@ from collections import defaultdict
 
 creditability = 'Creditability'
 creditability_values = [0, 1]
-
+total_nodes = 0
 
 
 class Node:
@@ -220,8 +220,9 @@ def check_tree(training, node, filter_min_data, filter_probability):
             node.moda = 0 if size_0 > size_1 else 1 
         return None
     
-def id3(training, attributes, values, father, max, filter_min_data , filter_gain, filter_probability):
-       
+def id3(training, attributes, values, father, max, filter_min_data , filter_gain, filter_probability, max_nodes):
+    #global total_nodes
+    
     if len(attributes) == 0 or len(values) == 0 or len(training) == 0:
         return father
 
@@ -233,6 +234,7 @@ def id3(training, attributes, values, father, max, filter_min_data , filter_gain
             return father
         
     if max is not None: max -= 1
+
     
     probability_dict_attribute,father_g = get_probabilities_and_father_g(training, attributes, values, father)
     attribute_max_gain, entropies, gain = calculate_max_gain_and_entropies(probability_dict_attribute,father_g,training.shape[0])
@@ -240,9 +242,34 @@ def id3(training, attributes, values, father, max, filter_min_data , filter_gain
     if father is not None and father.value is not None and filter_gain is not None and gain <= filter_gain:
         finish_tree(training, father)
         return father
+    
+    max_childs = 0
+    remainder = 0
+    if max_nodes is not None: 
+        max_childs = max_nodes // len(values[attribute_max_gain])
+        remainder = max_nodes % len(values[attribute_max_gain])
+        
+        
 
     for idx,value in enumerate(values[attribute_max_gain]):
+        nodes_childs = None
+        if max_nodes is not None:
+            nodes_childs = 0
+            if max_nodes == 0:
+                finish_tree(training, father)
+                return father
+            if remainder > 0:
+                remainder -= 1
+                nodes_childs = 1
+        
+            nodes_childs += max_childs
+            nodes_childs-=1
+            max_nodes-=1
+
         new_node = Node([],value,entropies[idx],gain,attribute_max_gain)
+
+        #total_nodes += 1
+
         father.append_desc(new_node)
         mask = training[attribute_max_gain] == value
         training_filter = training[mask]
@@ -256,15 +283,11 @@ def id3(training, attributes, values, father, max, filter_min_data , filter_gain
             new_val.pop(attribute_max_gain)
         
             if (max is None and new_attributes is not None ) or ( max > 0):
-                id3(training_filter,new_attributes,new_val,new_node,max,filter_min_data,filter_gain, filter_probability)
+                id3(training_filter,new_attributes,new_val,new_node,max,filter_min_data,filter_gain, filter_probability,nodes_childs)
             else:
                 finish_tree(training, new_node)
 
-
+    #print(total_nodes)
     return father
 
     
-    ## nodo vacio
-    ##ganacia para los attributos set
-    ##> ganancia --> lo agregamos al arbol
-    ##volver a llamar a id3 pero sin ese atributo en el training_ set

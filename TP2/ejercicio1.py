@@ -9,6 +9,7 @@ import numpy as np
 import math
 import id3_algorithm
 import randomForest
+import matplotlib.pyplot as plt
 from collections import defaultdict
 
 creditability = 'Creditability'
@@ -98,6 +99,7 @@ def resolve_test(test,father):
     print(confusion_matrix)
     print(tasa_falsos_positivos)
     print(tasa_verdaderos_postivos)
+    print(metrics.accuracy(confusion_matrix))
     return metrics.accuracy(confusion_matrix)
     
 
@@ -120,6 +122,33 @@ def resolve_random_forest(dict_predicted, expected_results):
     print(metrics.accuracy(confusion_matrix))
     return metrics.accuracy(confusion_matrix)
 
+def plot_max_nodes_precision(training, test, attributes):
+    values_per_atr = {}
+    for atr in attributes : 
+        values_per_atr[atr] = training[atr].unique()
+
+    dict_depth = {}
+    for i in range(180, 1880, 100):
+        father = id3_algorithm.id3(training,attributes,values_per_atr,None, None,None,None,0.8,i) #tree of the training
+        accuracy = resolve_test(test, father)
+        dict_depth[i] = accuracy
+    
+
+    fig, ax = plt.subplots()
+
+    # set the x-axis to logarithmic scale
+    #ax.set_xscale('log')
+    x = []
+    y = []
+    for key, value in sorted(dict_depth.items()):
+        x.append(key)
+        y.append(value)
+        ax.scatter(key, value, color='blue')
+
+
+    # join the points with a line
+    ax.plot(x, y, color='blue')
+    plt.show()
 
 
 def main():
@@ -138,32 +167,37 @@ def main():
          training = pd.concat([training, df_list[j]], axis=0)
 
     attributes.remove(creditability)
-    #values_per_atr = {}
 
 
+    #########################################################
     #execute ID3
+    #values_per_atr = {}
     #for atr in attributes : 
     #    values_per_atr[atr] = training[atr].unique()
-
-
-    #father = id3_algorithm.id3(training,attributes,values_per_atr,None, None,None,None) #tree of the training
- 
+    #father = id3_algorithm.id3(training,attributes,values_per_atr,None,None, None,None,0.8,None) #tree of the training
     #resolve_test(test, father)
 
-    fathers = randomForest.random_forest(training,attributes,1,None,1,None,0.83)
-    dict_predicted = {}
-    for index, row in test.iterrows():
-        dict_predicted[index] = {item: 0 for item in creditability_values}
 
-    for father in fathers:
-        pred = predicted(test, father)
+    #########################################################
+    #execute Random forest
+    #fathers = randomForest.random_forest(training,attributes,10,None,None,None,0.7)
+    #dict_predicted = {}
+    #for index, row in test.iterrows():
+    #    dict_predicted[index] = {item: 0 for item in creditability_values}
 
-        for index, value in enumerate(pred):
-            dict_predicted[index][value] += 1
+    #for father in fathers:
+    #    pred = predicted(test, father)
 
-    expected_result = expected(test)
+    #    for index, value in enumerate(pred):
+    #        dict_predicted[index][value] += 1
 
-    resolve_random_forest(dict_predicted,expected_result)
+    #expected_result = expected(test)
+
+    #resolve_random_forest(dict_predicted,expected_result)
+
+
+    plot_max_nodes_precision(training, test, attributes) 
+
 
    
 if __name__ == "__main__":
