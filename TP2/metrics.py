@@ -3,16 +3,15 @@ import pandas as pd
 import copy
 import random
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 iterations = 10
-
 
 # SEED = 2023
 # random.seed(SEED)
 
 SEED = 50000000
 random.seed(SEED)
-
 
 
 # def cross_validation(dataset, k):
@@ -27,10 +26,10 @@ random.seed(SEED)
 
 def bagging(dataset, k):
     df_list = []
-    split_size = int(dataset.shape[0]/k)
+    split_size = int(dataset.shape[0] / k)
     for i in range(k):
-        df_list.append(dataset.sample( random_state=SEED,n=split_size, replace=True).reset_index(drop=True) )
-    
+        df_list.append(dataset.sample(random_state=SEED, n=split_size, replace=True).reset_index(drop=True))
+
     return df_list
 
 
@@ -39,12 +38,38 @@ def cross_validation(dataset, k):
     df_list = np.array_split(dataset, k)
     return df_list
 
+
 def cross_validation_for_2(dataset, k):
-    dataset = dataset.dropna()
+    # dataset = dataset.dropna()
     dataset = dataset.sample(frac=1).reset_index(drop=True)
     df_list = np.array_split(dataset, k)
     return df_list
 
+def plot_confusion_matrix(conf_matrix):
+    # Change figure size and increase dpi for better resolution
+    plt.figure(figsize=(8, 6), dpi=100)
+    # Scale up the size of all text
+    sns.set(font_scale=1.1)
+
+    # Plot Confusion Matrix using Seaborn heatmap()
+    # Parameters:
+    # first param - confusion matrix in array format
+    # annot = True: show the numbers in each heatmap cell
+    # fmt = 'd': show numbers as integers.
+    ax = sns.heatmap(conf_matrix, annot=True)
+
+    # set x-axis label and ticks.
+    ax.set_xlabel("Predicted Diagnosis", fontsize=14, labelpad=20)
+    ax.xaxis.set_ticklabels(['Negative', 'Positive'])
+
+    # set y-axis label and ticks
+    ax.set_ylabel("Actual Diagnosis", fontsize=14, labelpad=20)
+    ax.yaxis.set_ticklabels(['Negative', 'Positive'])
+
+    # set plot title
+    ax.set_title("Confusion Matrix for Stars Rating.", fontsize=14, pad=20)
+
+    plt.show()
 
 def confusion_matrix_by_category(category, predicted, expected):
     matrix = np.zeros((2, 2))
@@ -75,6 +100,7 @@ def calculate_accuracy(expected, predicted):
         if i == j:
             count += 1
     return count / len(expected)
+
 
 
 def plot_roc(individual_classifications: dict):
