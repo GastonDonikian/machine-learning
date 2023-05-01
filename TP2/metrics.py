@@ -7,21 +7,8 @@ import seaborn as sns
 
 iterations = 10
 
-# SEED = 2023
-# random.seed(SEED)
-
-SEED = 50000000
+SEED = 5017
 random.seed(SEED)
-
-
-# def cross_validation(dataset, k):
-#    n = int(len(dataset) / k)
-#    dataset = dataset.sample(frac=1).reset_index(drop=True)
-#    for i in range(k):
-#        test_indices = np.random.choice(len(dataset), n, replace=False)
-#        test = dataset.iloc[test_indices].reset_index(drop=True)
-#        train = dataset.drop(test_indices).reset_index(drop=True)
-#    return train, test
 
 
 def bagging(dataset, k):

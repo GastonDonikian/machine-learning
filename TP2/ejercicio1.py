@@ -9,12 +9,17 @@ import numpy as np
 import math
 import id3_algorithm
 import randomForest
+import matplotlib.pyplot as plt
+import draw_tree
 from collections import defaultdict
 
 creditability = 'Creditability'
 creditability_values = [0, 1]
 
+def plot_gain(data_frame, attributes):
 
+    for attribute in attributes:
+        gain = id3_algorithm.gain()
 
 def preprocessing(data_frame, name, parts):
     data = data_frame[name].to_numpy()
@@ -98,6 +103,7 @@ def resolve_test(test,father):
     print(confusion_matrix)
     print(tasa_falsos_positivos)
     print(tasa_verdaderos_postivos)
+    print(metrics.accuracy(confusion_matrix))
     return metrics.accuracy(confusion_matrix)
     
 
@@ -120,6 +126,33 @@ def resolve_random_forest(dict_predicted, expected_results):
     print(metrics.accuracy(confusion_matrix))
     return metrics.accuracy(confusion_matrix)
 
+def plot_max_nodes_precision(training, test, attributes):
+    values_per_atr = {}
+    for atr in attributes : 
+        values_per_atr[atr] = training[atr].unique()
+
+    dict_depth = {}
+    for i in range(180, 1880, 100):
+        father = id3_algorithm.id3(training,attributes,values_per_atr,None, None,None,None,None,i) #tree of the training
+        accuracy = resolve_test(test, father)
+        dict_depth[i] = accuracy
+    
+
+    fig, ax = plt.subplots()
+
+    # set the x-axis to logarithmic scale
+    #ax.set_xscale('log')
+    x = []
+    y = []
+    for key, value in sorted(dict_depth.items()):
+        x.append(key)
+        y.append(value)
+        ax.scatter(key, value, color='blue')
+
+
+    # join the points with a line
+    ax.plot(x, y, color='blue')
+    plt.show()
 
 
 def main():
@@ -137,33 +170,39 @@ def main():
     for j in range(1, partition):
          training = pd.concat([training, df_list[j]], axis=0)
 
-    attributes.remove(creditability)
-    #values_per_atr = {}
+    attributes.remove(creditability) 
 
 
+    #########################################################
     #execute ID3
-    #for atr in attributes : 
-    #    values_per_atr[atr] = training[atr].unique()
+    values_per_atr = {}
+    for atr in attributes : 
+       values_per_atr[atr] = training[atr].unique()
+    father = id3_algorithm.id3(training,attributes,values_per_atr,None,None, None,None,None,12) #tree of the training
+    resolve_test(test, father)
+    draw_tree.graph_tree(father)
+    print(id3_algorithm.count_nodes(father))
+
+    #########################################################
+    #execute Random forest
+    #fathers = randomForest.random_forest(training,attributes,10,None,None,None,0.7)
+    #dict_predicted = {}
+    #for index, row in test.iterrows():
+    #    dict_predicted[index] = {item: 0 for item in creditability_values}
+
+    #for father in fathers:
+    #    pred = predicted(test, father)
+
+    #    for index, value in enumerate(pred):
+    #        dict_predicted[index][value] += 1
+
+    #expected_result = expected(test)
+
+    #resolve_random_forest(dict_predicted,expected_result)
 
 
-    #father = id3_algorithm.id3(training,attributes,values_per_atr,None, None,None,None) #tree of the training
- 
-    #resolve_test(test, father)
+    #plot_max_nodes_precision(training, test, attributes) 
 
-    fathers = randomForest.random_forest(training,attributes,1,None,1,None,0.83)
-    dict_predicted = {}
-    for index, row in test.iterrows():
-        dict_predicted[index] = {item: 0 for item in creditability_values}
-
-    for father in fathers:
-        pred = predicted(test, father)
-
-        for index, value in enumerate(pred):
-            dict_predicted[index][value] += 1
-
-    expected_result = expected(test)
-
-    resolve_random_forest(dict_predicted,expected_result)
 
    
 if __name__ == "__main__":
