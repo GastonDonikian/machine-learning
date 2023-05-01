@@ -222,7 +222,7 @@ def check_tree(training, node, filter_min_data, filter_probability):
     
 def id3(training, attributes, values, father, max, filter_min_data , filter_gain, filter_probability, max_nodes):
     #global total_nodes
-    
+
     if len(attributes) == 0 or len(values) == 0 or len(training) == 0:
         return father
 
@@ -243,9 +243,14 @@ def id3(training, attributes, values, father, max, filter_min_data , filter_gain
         finish_tree(training, father)
         return father
     
+
+    
     max_childs = 0
     remainder = 0
     if max_nodes is not None: 
+        if max_nodes <= 1:
+            finish_tree(training, father)
+            return father
         max_childs = max_nodes // len(values[attribute_max_gain])
         remainder = max_nodes % len(values[attribute_max_gain])
         
@@ -254,17 +259,15 @@ def id3(training, attributes, values, father, max, filter_min_data , filter_gain
     for idx,value in enumerate(values[attribute_max_gain]):
         nodes_childs = None
         if max_nodes is not None:
-            nodes_childs = 0
-            if max_nodes == 0:
-                finish_tree(training, father)
-                return father
+            nodes_childs = 0  
             if remainder > 0:
                 remainder -= 1
                 nodes_childs = 1
-        
             nodes_childs += max_childs
+            if nodes_childs == 0:
+                finish_tree(training, father)
+                return father
             nodes_childs-=1
-            max_nodes-=1
 
         new_node = Node([],value,entropies[idx],gain,attribute_max_gain)
 
