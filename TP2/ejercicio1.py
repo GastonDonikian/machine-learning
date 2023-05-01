@@ -10,12 +10,16 @@ import math
 import id3_algorithm
 import randomForest
 import matplotlib.pyplot as plt
+import draw_tree
 from collections import defaultdict
 
 creditability = 'Creditability'
 creditability_values = [0, 1]
 
+def plot_gain(data_frame, attributes):
 
+    for attribute in attributes:
+        gain = id3_algorithm.gain()
 
 def preprocessing(data_frame, name, parts):
     data = data_frame[name].to_numpy()
@@ -129,7 +133,7 @@ def plot_max_nodes_precision(training, test, attributes):
 
     dict_depth = {}
     for i in range(180, 1880, 100):
-        father = id3_algorithm.id3(training,attributes,values_per_atr,None, None,None,None,0.8,i) #tree of the training
+        father = id3_algorithm.id3(training,attributes,values_per_atr,None, None,None,None,None,i) #tree of the training
         accuracy = resolve_test(test, father)
         dict_depth[i] = accuracy
     
@@ -166,17 +170,18 @@ def main():
     for j in range(1, partition):
          training = pd.concat([training, df_list[j]], axis=0)
 
-    attributes.remove(creditability)
+    attributes.remove(creditability) 
 
 
     #########################################################
     #execute ID3
-    #values_per_atr = {}
-    #for atr in attributes : 
-    #    values_per_atr[atr] = training[atr].unique()
-    #father = id3_algorithm.id3(training,attributes,values_per_atr,None,None, None,None,0.8,None) #tree of the training
-    #resolve_test(test, father)
-
+    values_per_atr = {}
+    for atr in attributes : 
+       values_per_atr[atr] = training[atr].unique()
+    father = id3_algorithm.id3(training,attributes,values_per_atr,None,None, None,None,None,12) #tree of the training
+    resolve_test(test, father)
+    draw_tree.graph_tree(father)
+    print(id3_algorithm.count_nodes(father))
 
     #########################################################
     #execute Random forest
@@ -196,7 +201,7 @@ def main():
     #resolve_random_forest(dict_predicted,expected_result)
 
 
-    plot_max_nodes_precision(training, test, attributes) 
+    #plot_max_nodes_precision(training, test, attributes) 
 
 
    
