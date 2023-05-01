@@ -3,19 +3,11 @@ import pandas as pd
 import copy
 import random
 import matplotlib.pyplot as plt
+
 iterations = 10
 SEED = 5017
 random.seed(SEED)
 
-
-# def cross_validation(dataset, k):
-#    n = int(len(dataset) / k)
-#    dataset = dataset.sample(frac=1).reset_index(drop=True)
-#    for i in range(k):
-#        test_indices = np.random.choice(len(dataset), n, replace=False)
-#        test = dataset.iloc[test_indices].reset_index(drop=True)
-#        train = dataset.drop(test_indices).reset_index(drop=True)
-#    return train, test
 
 
 def bagging(dataset, k):
@@ -29,6 +21,12 @@ def bagging(dataset, k):
 
 def cross_validation(dataset, k):
     dataset = dataset.sample(frac=1, random_state=SEED).reset_index(drop=True)
+    df_list = np.array_split(dataset, k)
+    return df_list
+
+def cross_validation_for_2(dataset, k):
+    dataset = dataset.dropna()
+    dataset = dataset.sample(frac=1).reset_index(drop=True)
     df_list = np.array_split(dataset, k)
     return df_list
 
@@ -52,12 +50,20 @@ def confusion_matrix_by_category(category, predicted, expected):
     if denominator != 0:
         tasa_falsos_positivos = matrix[0][1] / (denominator)
         tasa_verdaderos_postivos = matrix[0][0] / (denominator)
-        
+
     return matrix, tasa_falsos_positivos, tasa_verdaderos_postivos
 
 
+def calculate_accuracy(expected, predicted):
+    count = 0
+    for i, j in zip(expected, predicted):
+        if i == j:
+            count += 1
+    return count / len(expected)
+
+
 def plot_roc(individual_classifications: dict):
-    actual = individual_classifications['Actual'] #expected
+    actual = individual_classifications['Actual']  # expected
 
     individual_classifications.pop('Actual')
     roc_ratios = {}
@@ -77,16 +83,18 @@ def plot_roc(individual_classifications: dict):
                         true_positive += 1
                     else:
                         false_positive += 1
-            roc_ratios[classification].append((false_positive/(total_count - total_count_positive[classification]),
-                                               true_positive/total_count_positive[classification]))
+            roc_ratios[classification].append((false_positive / (total_count - total_count_positive[classification]),
+                                               true_positive / total_count_positive[classification]))
     for k in roc_ratios.keys():
         plt.plot(*zip(*roc_ratios[k]), label=k)
     plt.title('ROC Curve')
-    plt.plot(np.linspace(start=0, stop=1, num=10), np.linspace(start=0, stop=1, num=10),label='y = x', linestyle='dashed',linewidth=0.9)
+    plt.plot(np.linspace(start=0, stop=1, num=10), np.linspace(start=0, stop=1, num=10), label='y = x',
+             linestyle='dashed', linewidth=0.9)
     plt.legend()
     plt.xlabel('False positives')
     plt.ylabel('True positives')
     plt.show()
+
 
 def confusion_matrix(classes, predicted, expected):
     print('Confusion matrix!')
