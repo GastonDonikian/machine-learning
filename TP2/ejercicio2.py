@@ -17,17 +17,25 @@ def exercise_b(data_frame):
     return train, test
 
 
+def preprocess_data_frame(df):
+    df = df.dropna()
+    df['titleSentiment'] = scale_array(
+        standarize_array(list(map(lambda x: 1 if x == 'positive' else 0 if x == 'negative' else x,
+                                  df['titleSentiment'].values))))
+    df['wordcount'] = scale_array(standarize_array(df['wordcount'].values))
+    df['sentimentValue'] = scale_array(standarize_array(df['sentimentValue'].values))
+    return df
+
+
 def preprocess_array(arr):
-    title_sentiment = standarize_array(list(map(lambda x: 1 if x == 'positive' else 0 if x == 'negative' else x,
-                                                arr['titleSentiment'].values)))
-    word_count = standarize_array(arr['wordcount'].values)
-    sentiment_value = standarize_array(arr['sentimentValue'].values)
+    title_sentiment = arr['titleSentiment'].values
+    word_count = arr['wordcount'].values
+    sentiment_value = arr['sentimentValue'].values
     objective_variable = arr['Star Rating'].values
     explicative_variables = list(zip(word_count,
                                      title_sentiment,
                                      sentiment_value))
     variables = list(zip(objective_variable, explicative_variables))
-    variables = list(filter(lambda x: not (np.isnan(x[1][0]) or np.isnan(x[1][1]) or np.isnan(x[1][2])), variables))
     return variables
 
 
@@ -47,11 +55,9 @@ def scale_array(values):
 
 # classified_array:: (actual, knn, weighted knn)
 def exercise_c(train, test):
-    train_variables = preprocess_array(train)
-    test_variables = preprocess_array(test)
     classified_array = []
-    for i in test_variables:
-        k_nearest = return_k_nearest(5, train_variables, i[1])
+    for i in test:
+        k_nearest = return_k_nearest(5, train, i[1])
         classified_array.append((i[0], classify_neighbours(k_nearest), classify_weighted_neighbours(k_nearest)))
     return classified_array
 
@@ -76,7 +82,7 @@ def classify_neighbours(k_neighbours):
     return max(count_dict, key=count_dict.get)
 
 
-##return the class with the highest weighted score of the k_netbours
+##return the class with the highest weighted score of the k_neighbours
 def classify_weighted_neighbours(k_neighbours):
     count_dict = {}
     for j in k_neighbours:
@@ -97,8 +103,8 @@ def euclidean_distance(a, b):
 
 
 def exercise_d(k, train, test, weighted=True):
-    train_variables = preprocess_array(train)
-    test_variables = preprocess_array(test)
+    train_variables = train
+    test_variables = test
     expected = []
     predicted = []
     for i in test_variables:
@@ -122,33 +128,35 @@ def print_confusion_matrix(predicted, expected):
         print("Confusion Matrix: " + str(confusion_matrix))
         print("False positive : " + str(tasa_falsos_positivos))
         print("True positive : " + str(tasa_verdaderos_postivos))
+    metrics.plot_confusion_matrix(confusion_matrix)
 
 
-def main():
-    data_frame = pd.read_csv('./resources/reviews_sentiment.csv', delimiter=';')
-    # print("Average word count for ratings of 1: " + str(round(exercise_a(data_frame), 2)))
-    # print(exercise_c(train=train, test=test)[:10])
+def plot_acc_vs_k_n(data_frame):
     accuracy_points_w = []
     std_points_w = []
 
     accuracy_points = []
     std_points = []
     k_points = []
-    repetitions = 5
-    for k in range(3, 51, 2):
+    repetitions = 100
+    standarized_data_frame = preprocess_data_frame(data_frame)
+    for k in range(3, 50, 2):
         accuracy_per_iter_w = []
         accuracy_per_iter = []
         for i in range(repetitions):
-            train, test = exercise_b(data_frame)
+            train, test = exercise_b(standarized_data_frame)
+            train = preprocess_array(train)
+            test = preprocess_array(test)
+
             expected, predicted = exercise_d(k=k, train=train, test=test, weighted=True)
             accuracy_per_iter_w.append(metrics.calculate_accuracy(expected, predicted))
             expected, predicted = exercise_d(k=k, train=train, test=test, weighted=False)
             accuracy_per_iter.append(metrics.calculate_accuracy(expected, predicted))
 
         accuracy_points_w.append(np.average(accuracy_per_iter_w))
-        std_points_w.append(np.std(accuracy_per_iter_w))
+        std_points_w.append(np.std(accuracy_per_iter_w) / np.sqrt(repetitions))
         accuracy_points.append(np.average(accuracy_per_iter))
-        std_points.append(np.std(accuracy_per_iter))
+        std_points.append(np.std(accuracy_per_iter) / np.sqrt(repetitions))
         k_points.append(k)
     plt.errorbar(k_points, accuracy_points_w, yerr=std_points_w, capsize=2, elinewidth=0.5, label="Weighted KNN")
     plt.errorbar(k_points, accuracy_points, yerr=std_points, capsize=2, elinewidth=0.5, label="KNN")
@@ -157,7 +165,20 @@ def main():
     plt.legend()
     plt.xlabel('k neighbours')
     plt.ylabel('accuracy')
+    plt.savefig('./images/knn.png', bbox_inches='tight')
     plt.show()
+
+def main():
+    data_frame = pd.read_csv('./resources/reviews_sentiment.csv', delimiter=';')
+    print("Average word count for ratings of 1: " + str(round(exercise_a(data_frame), 2)))
+    standarized_data_frame = preprocess_data_frame(data_frame)
+    train, test = exercise_b(standarized_data_frame)
+    train = preprocess_array(train)
+    test = preprocess_array(test)
+    print_confusion_matrix(*exercise_d(k=7, train=train, test=test))
+
+    # print(exercise_c(train=train, test=test)[:10])
+    # plot_acc_vs_k_n(data_frame=data_frame)
 
 
 if __name__ == "__main__":
