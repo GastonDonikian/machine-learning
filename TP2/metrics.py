@@ -5,14 +5,14 @@ import random
 import matplotlib.pyplot as plt
 
 iterations = 10
-SEED = 5017
+SEED = 5000
 random.seed(SEED)
 
 
 
 def bagging(dataset, k):
     df_list = []
-    split_size = int(dataset.shape[0]/k)
+    split_size = int(dataset.shape[0])
     for i in range(k):
         df_list.append(dataset.sample( random_state=SEED,n=split_size, replace=True).reset_index(drop=True) )
     
