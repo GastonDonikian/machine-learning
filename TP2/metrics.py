@@ -6,22 +6,13 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 iterations = 10
-<<<<<<< HEAD
 SEED = 5000
-=======
-
-SEED = 5017
->>>>>>> b575d2f2bff525881e4d2394ed34031dffc41f6e
 random.seed(SEED)
 
 
 def bagging(dataset, k):
     df_list = []
-<<<<<<< HEAD
     split_size = int(dataset.shape[0])
-=======
-    split_size = int(dataset.shape[0] / k)
->>>>>>> b575d2f2bff525881e4d2394ed34031dffc41f6e
     for i in range(k):
         df_list.append(dataset.sample(random_state=SEED, n=split_size, replace=True).reset_index(drop=True))
 

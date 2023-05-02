@@ -2,11 +2,8 @@ import pandas as pd
 from line_profiler import LineProfiler
 from sklearn.model_selection import train_test_split
 from collections import Counter
-import re
-import random
 import metrics
 import numpy as np
-import math
 import id3_algorithm
 import randomForest
 import matplotlib.pyplot as plt
@@ -168,6 +165,8 @@ def plot_max_nodes_precision(training, test, attributes):
     # join the points with a line
     ax.plot(x, y, color='pink')
 
+    plt.xlabel('Max Nodes')
+    plt.ylabel('Tree precision')
 
     plt.show()
 
