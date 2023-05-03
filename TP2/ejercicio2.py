@@ -19,11 +19,10 @@ def exercise_b(data_frame):
 
 def preprocess_data_frame(df):
     df = df.dropna()
-    df['titleSentiment'] = scale_array(
-        standarize_array(list(map(lambda x: 1 if x == 'positive' else 0 if x == 'negative' else x,
+    df['titleSentiment'] = standarize_array(scale_array(list(map(lambda x: 1 if x == 'positive' else 0 if x == 'negative' else x,
                                   df['titleSentiment'].values))))
-    df['wordcount'] = scale_array(standarize_array(df['wordcount'].values))
-    df['sentimentValue'] = scale_array(standarize_array(df['sentimentValue'].values))
+    df['wordcount'] = standarize_array(scale_array(df['wordcount'].values))
+    df['sentimentValue'] = standarize_array(scale_array(df['sentimentValue'].values))
     return df
 
 
@@ -125,9 +124,11 @@ def print_confusion_matrix(predicted, expected):
                                                  predicted=predicted,
                                                  expected=expected)
         print("category: " + str(i))
-        print("Confusion Matrix: " + str(confusion_matrix))
-        print("False positive : " + str(tasa_falsos_positivos))
-        print("True positive : " + str(tasa_verdaderos_postivos))
+        print("Precision: " + str(metrics.precision(confusion_matrix)))
+    confusion_matrix= \
+        metrics.confusion_matrix(classes=[1,2,3,4,5],
+                                             predicted=predicted,
+                                             expected=expected)
     metrics.plot_confusion_matrix(confusion_matrix)
 
 

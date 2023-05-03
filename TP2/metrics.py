@@ -31,6 +31,7 @@ def cross_validation_for_2(dataset, k):
     df_list = np.array_split(dataset, k)
     return df_list
 
+
 def plot_confusion_matrix(conf_matrix):
     # Change figure size and increase dpi for better resolution
     plt.figure(figsize=(8, 6), dpi=100)
@@ -45,17 +46,18 @@ def plot_confusion_matrix(conf_matrix):
     ax = sns.heatmap(conf_matrix, annot=True)
 
     # set x-axis label and ticks.
-    ax.set_xlabel("Predicted Diagnosis", fontsize=14, labelpad=20)
-    ax.xaxis.set_ticklabels(['Negative', 'Positive'])
+    ax.set_xlabel("Predicted Stars", fontsize=14, labelpad=20)
+    ax.xaxis.set_ticklabels(['1 Star', '2 Star','3 Star','4 Star','5 Star'])
 
     # set y-axis label and ticks
-    ax.set_ylabel("Actual Diagnosis", fontsize=14, labelpad=20)
-    ax.yaxis.set_ticklabels(['Negative', 'Positive'])
+    ax.set_ylabel("Actual Stars", fontsize=14, labelpad=20)
+    ax.yaxis.set_ticklabels(['1 Star', '2 Star','3 Star','4 Star','5 Star'])
 
     # set plot title
     ax.set_title("Confusion Matrix for Stars Rating.", fontsize=14, pad=20)
-
+    plt.savefig('./images/standarized_scale_confusion_matrix.png', bbox_inches='tight')
     plt.show()
+
 
 def confusion_matrix_by_category(category, predicted, expected):
     matrix = np.zeros((2, 2))
@@ -80,13 +82,14 @@ def confusion_matrix_by_category(category, predicted, expected):
     return matrix, tasa_falsos_positivos, tasa_verdaderos_postivos
 
 
+
+
 def calculate_accuracy(expected, predicted):
     count = 0
     for i, j in zip(expected, predicted):
         if i == j:
             count += 1
     return count / len(expected)
-
 
 
 def plot_roc(individual_classifications: dict):
@@ -129,7 +132,6 @@ def confusion_matrix(classes, predicted, expected):
     for i, j in zip(expected, predicted):
         # print(f"Expected: {i}, Predicted: {j}")
         matrix[get_index(i)][get_index(j)] += 1
-    print(matrix)
     return matrix
 
 
@@ -142,6 +144,7 @@ def get_index(category):
         return 2
     if category == 'Salud':
         return 3
+    return category - 1
 
 
 def accuracy(confusion_matrix):
