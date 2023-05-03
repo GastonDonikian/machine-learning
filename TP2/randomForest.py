@@ -12,15 +12,15 @@ from collections import defaultdict
 
 
 
-def random_forest(training,attributes,tree_count,max,filter_min_data,filter_gain, filter_probability):
+def random_forest(training,attributes,tree_count,max,filter_min_data,filter_gain, filter_probability,max_nodes, seed):
     nodes_fathers =[]
-    df_list = metrics.bagging(training,tree_count)
+    df_list = metrics.bagging(training,tree_count,seed)
 
     for data_frame in df_list:
         values_per_atr = {}
         for atr in attributes :
             values_per_atr[atr] = data_frame[atr].unique()
         
-        nodes_fathers.append(id3_algorithm.id3(data_frame,attributes,values_per_atr,None, max,filter_min_data,filter_gain, filter_probability))
+        nodes_fathers.append(id3_algorithm.id3(data_frame,attributes,values_per_atr,None, max,filter_min_data,filter_gain, filter_probability,max_nodes))
 
     return nodes_fathers

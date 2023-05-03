@@ -6,21 +6,21 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 iterations = 10
-SEED = 5000
+SEED = 5017
 random.seed(SEED)
 
 
-def bagging(dataset, k):
+def bagging(dataset, k,seed):
     df_list = []
     split_size = int(dataset.shape[0])
     for i in range(k):
-        df_list.append(dataset.sample(random_state=SEED, n=split_size, replace=True).reset_index(drop=True))
+        df_list.append(dataset.sample(random_state=seed, n=split_size, replace=True).reset_index(drop=True))
 
     return df_list
 
 
-def cross_validation(dataset, k):
-    dataset = dataset.sample(frac=1, random_state=SEED).reset_index(drop=True)
+def cross_validation(dataset, k,seed= SEED):
+    dataset = dataset.sample(frac=1, random_state=seed).reset_index(drop=True)
     df_list = np.array_split(dataset, k)
     return df_list
 

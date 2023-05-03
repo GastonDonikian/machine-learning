@@ -72,11 +72,30 @@ def get_probabilities(training, attributes, values):
     return probability_dict_attribute,  entropy_general
 
 
+def calculate_gains(training, attributes, values):
+    probability_dict_attribute, entropy_general = get_probabilities(training, attributes, values)
+    gains = {}
+    total = training.shape[0]
+    for attr in probability_dict_attribute:
+        gain = entropy_general
+        for value in probability_dict_attribute[attr]:
+            creditability_0 = probability_dict_attribute[attr][value][0]
+            creditability_1 = probability_dict_attribute[attr][value][1]
+            creditability_sum = creditability_0 + creditability_1
+            if creditability_sum != 0:
+                probs = []
+                probs.append(creditability_0/creditability_sum)
+                probs.append(creditability_1/creditability_sum)
+                gain -= creditability_sum/total * entropy(probs)
+            
+        gains[attr] = gain
+    
+    return gains
+
 def calculate_max_gain_and_entropies(training,attributes, values):
     probability_dict_attribute, entropy_general = get_probabilities(training, attributes, values)
     max_gain = 0
     attribute_max_gain = None
-    entropies = []
     total = training.shape[0]
     for attr in probability_dict_attribute:
         gain = entropy_general
