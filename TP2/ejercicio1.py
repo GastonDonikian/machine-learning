@@ -14,6 +14,7 @@ import pandas as pd
 import utils_id3
 import matplotlib.colors as mcolors
 import seaborn as sns
+import matplotlib.ticker as ticker
 
 creditability = 'Creditability'
 creditability_values = [0, 1]
@@ -305,13 +306,13 @@ def resolve_test(test,father):
         expected_result.append(row[creditability])
         predicted_result.append(classify_input(row,father))
         
-    confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(creditability_values[1], expected_result, predicted_result)
+    confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(creditability_values[0], expected_result, predicted_result)
     print(confusion_matrix)
     print(tasa_falsos_positivos)
     print(tasa_verdaderos_postivos)
     print(metrics.accuracy(confusion_matrix))
 
-    #heatmap_matrix(confusion_matrix)
+    heatmap_matrix(confusion_matrix)
     return metrics.accuracy(confusion_matrix)
     
 
@@ -327,12 +328,12 @@ def resolve_random_forest(dict_predicted, expected_results):
         else:
             predicted.append(0)
     
-    confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(creditability_values[1], expected_results, predicted)
+    confusion_matrix, tasa_falsos_positivos, tasa_verdaderos_postivos = metrics.confusion_matrix_by_category(creditability_values[0], expected_results, predicted)
     print(confusion_matrix)
     print(tasa_falsos_positivos)
     print(tasa_verdaderos_postivos)
     print(metrics.accuracy(confusion_matrix))
-    #heatmap_matrix(confusion_matrix)
+    heatmap_matrix(confusion_matrix)
     return metrics.accuracy(confusion_matrix)
 
 
@@ -518,27 +519,27 @@ def main():
     #     values_per_atr[atr] = training[atr].unique()
     # father = id3_algorithm.id3(training,attributes,values_per_atr,None,None, None,None,None,None) #tree of the training
     # resolve_test(test, father)
-    # draw_tree.graph_tree(father)
-    # print(id3_algorithm.count_nodes(father))
+    #draw_tree.graph_tree(father)
+    #print(id3_algorithm.count_nodes(father))
     
 
 
     #########################################################
     #execute Random forest
-    # fathers = randomForest.random_forest(training,attributes,10,None,None,None,None,None)
-    # dict_predicted = {}
-    # for index, row in test.iterrows():
-    #    dict_predicted[index] = {item: 0 for item in creditability_values}
+    fathers = randomForest.random_forest(training,attributes,10,None,None,None,None,None)
+    dict_predicted = {}
+    for index, row in test.iterrows():
+       dict_predicted[index] = {item: 0 for item in creditability_values}
 
-    # for father in fathers:
-    #    pred = predicted(test, father)
+    for father in fathers:
+       pred = predicted(test, father)
 
-    #    for index, value in enumerate(pred):
-    #        dict_predicted[index][value] += 1
+       for index, value in enumerate(pred):
+           dict_predicted[index][value] += 1
 
-    # expected_result = expected(test)
+    expected_result = expected(test)
 
-    # resolve_random_forest(dict_predicted,expected_result)
+    resolve_random_forest(dict_predicted,expected_result)
 
 
     #plot_max_nodes_precision(data) 
@@ -551,7 +552,7 @@ def main():
     
     #plot_Random_forest_probability(data)
 
-    plot_probability_precision(data)
+    #plot_probability_precision(data)
    
 if __name__ == "__main__":
     main() 
