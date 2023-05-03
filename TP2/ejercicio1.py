@@ -18,8 +18,142 @@ import seaborn as sns
 creditability = 'Creditability'
 creditability_values = [0, 1]
 
+
+def plot_Random_forest_probability(data):
+
+    partition = 5
+
+    training = pd.DataFrame()
+    attributes = list(data.head(0))
+    attributes.remove(creditability) 
+
+    
+    repetitions = 5
+    dict_depth = {}
+    dict_depth_training = {}
+    std_test = []
+    std_training = []
+    for i in range(0, 11):
+        f = float(i) / 10.0
+        acc_test = []
+        acc_training = []
+        for r in range(repetitions):    
+            #DIVIDO TRAINING Y TESTEO
+            df_list = metrics.cross_validation(data, partition,r)
+            test = df_list[0]
+            training = pd.DataFrame()
+            for j in range(1, partition):
+                training = pd.concat([training, df_list[j]], axis=0)
+            
+            #ejecuto random forest
+            fathers = randomForest.random_forest(training,attributes,5,None,None,None,f,None,r)
+
+            accuracy_test = accuracy_random_forest(fathers, test)
+            accuracy_training = accuracy_random_forest(fathers, training)
+            
+           
+            acc_test.append(accuracy_test)
+            acc_training.append(accuracy_training)
+           
+        
+        std_test.append( np.std(acc_test)/np.sqrt(repetitions))
+        dict_depth[f] = np.mean(acc_test)
+        std_training.append( np.std(acc_training)/np.sqrt(repetitions))
+        
+        dict_depth_training[f] = np.mean(acc_training)
+
+    fig, ax = plt.subplots()
+
+    # join the points with a line
+    x = dict_depth.keys()
+    y = dict_depth.values()
+    ax.plot(x,y, ".-", color='cyan' )
+    plt.errorbar(x,y, yerr = std_test ,capsize=2, elinewidth=0.5, label="Test")
+    
+
+
+    # join the points with a line
+    x = dict_depth_training.keys()
+    y = dict_depth_training.values()
+    ax.plot(x,y,".-", color='pink')
+
+
+    plt.errorbar(x,y, yerr = std_training, capsize=2, elinewidth=0.5, label="Training")
+    plt.xlabel('Probability filter')
+    plt.ylabel('Tree precision')
+    plt.legend(loc='upper right')
+    plt.show()
+
+
+def plot_probability_precision(data):
+
+    partition = 5
+
+    training = pd.DataFrame()
+    attributes = list(data.head(0))
+    attributes.remove(creditability) 
+
+    
+    repetitions = 5
+    dict_depth = {}
+    dict_depth_training = {}
+    std_test = []
+    std_training = []
+    for i in range(0, 11):
+        f = float(i) / 10.0
+        acc_test = []
+        acc_training = []
+        for r in range(repetitions):    
+            df_list = metrics.cross_validation(data, partition,r)
+            test = df_list[0]
+            training = pd.DataFrame()
+            for j in range(1, partition):
+                training = pd.concat([training, df_list[j]], axis=0)
+            values_per_atr = {}
+            for atr in attributes : 
+                values_per_atr[atr] = training[atr].unique()
+            father = id3_algorithm.id3(training,attributes,values_per_atr,None, None,None,None,f,None) #tree of the training
+            accuracy = resolve_test(test, father)
+            #dict_depth[i] = accuracy
+            accuracy_training = resolve_test(training, father)
+            acc_test.append(accuracy)
+            acc_training.append(accuracy_training)
+
+            nodesCount = id3_algorithm.count_nodes(father)
+            #dict_depth_training[i] = accuracy_training
+        
+        std_test.append( np.std(acc_test)/np.sqrt(repetitions))
+       
+        dict_depth[f] = np.mean(acc_test)
+        std_training.append( np.std(acc_training)/np.sqrt(repetitions))
+        dict_depth_training[f] = np.mean(acc_training)
+
+    fig, ax = plt.subplots()
+
+
+    # join the points with a line
+    x = dict_depth.keys()
+    y = dict_depth.values()
+    ax.plot(x,y, ".-", color='cyan' )
+    plt.errorbar(x,y, yerr = std_test ,capsize=2, elinewidth=0.5, label="Test")
+    
+
+
+    # join the points with a line
+    x = dict_depth_training.keys()
+    y = dict_depth_training.values()
+    ax.plot(x,y,".-", color='pink')
+
+
+    plt.errorbar(x,y, yerr = std_training, capsize=2, elinewidth=0.5, label="Training")
+    plt.xlabel('Probability filter')
+    plt.ylabel('Tree precision')
+    plt.legend(loc='upper right')
+    plt.show()
+
+
 def plot_variables_count(data_frame):
-    attribute = 'creditability'
+    attribute = 'Duration of Credit (month)'
     values = data_frame[attribute].unique()
 
     plt.xlabel(attribute,fontsize=8)
@@ -177,7 +311,7 @@ def resolve_test(test,father):
     print(tasa_verdaderos_postivos)
     print(metrics.accuracy(confusion_matrix))
 
-    heatmap_matrix(confusion_matrix)
+    #heatmap_matrix(confusion_matrix)
     return metrics.accuracy(confusion_matrix)
     
 
@@ -198,6 +332,7 @@ def resolve_random_forest(dict_predicted, expected_results):
     print(tasa_falsos_positivos)
     print(tasa_verdaderos_postivos)
     print(metrics.accuracy(confusion_matrix))
+    #heatmap_matrix(confusion_matrix)
     return metrics.accuracy(confusion_matrix)
 
 
@@ -364,16 +499,16 @@ def main():
     data = replaces_process_data(data, 'Age (years)', 6)
 
     
-    plot_variables_count(data)
+    #plot_variables_count(data)
 
-    # partition = 5
-    # df_list = metrics.cross_validation(data, partition)
-    # test = df_list[0]
-    # training = pd.DataFrame()
-    # for j in range(1, partition):
-    #       training = pd.concat([training, df_list[j]], axis=0)
+    partition = 5
+    df_list = metrics.cross_validation(data, partition)
+    test = df_list[0]
+    training = pd.DataFrame()
+    for j in range(1, partition):
+          training = pd.concat([training, df_list[j]], axis=0)
 
-    # attributes.remove(creditability) 
+    attributes.remove(creditability) 
 
 
     #########################################################
@@ -390,20 +525,20 @@ def main():
 
     #########################################################
     #execute Random forest
-    #fathers = randomForest.random_forest(training,attributes,10,None,None,None,0.7)
-    #dict_predicted = {}
-    #for index, row in test.iterrows():
+    # fathers = randomForest.random_forest(training,attributes,10,None,None,None,None,None)
+    # dict_predicted = {}
+    # for index, row in test.iterrows():
     #    dict_predicted[index] = {item: 0 for item in creditability_values}
 
-    #for father in fathers:
+    # for father in fathers:
     #    pred = predicted(test, father)
 
     #    for index, value in enumerate(pred):
     #        dict_predicted[index][value] += 1
 
-    #expected_result = expected(test)
+    # expected_result = expected(test)
 
-    #resolve_random_forest(dict_predicted,expected_result)
+    # resolve_random_forest(dict_predicted,expected_result)
 
 
     #plot_max_nodes_precision(data) 
@@ -413,7 +548,10 @@ def main():
     #plot_gain_number_values(data) 
 
     #plot_Random_forest_max_nodes(data)
+    
+    #plot_Random_forest_probability(data)
 
+    plot_probability_precision(data)
    
 if __name__ == "__main__":
     main() 
