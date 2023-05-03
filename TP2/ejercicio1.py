@@ -18,6 +18,23 @@ import seaborn as sns
 creditability = 'Creditability'
 creditability_values = [0, 1]
 
+def plot_variables_count(data_frame):
+    attribute = 'creditability'
+    values = data_frame[attribute].unique()
+
+    plt.xlabel(attribute,fontsize=8)
+    plt.ylabel('Count',fontsize=8)
+    count = []
+    for value in values:
+        mask = data_frame[attribute] == value
+        data_frame_filter = data_frame[mask]
+        count.append(data_frame_filter.shape[0])
+
+    # Create bars
+    plt.bar(values,count, color=mcolors.TABLEAU_COLORS)
+    # Show graph
+    plt.show()
+
 
 def plot_gain_number_values(data_frame):
     attributes = ['Duration of Credit (month)','Credit Amount',  'Age (years)']
@@ -346,24 +363,26 @@ def main():
     data = replaces_process_data(data, 'Credit Amount', 4)
     data = replaces_process_data(data, 'Age (years)', 6)
 
+    
+    plot_variables_count(data)
 
-    partition = 5
-    df_list = metrics.cross_validation(data, partition)
-    test = df_list[0]
-    training = pd.DataFrame()
-    for j in range(1, partition):
-          training = pd.concat([training, df_list[j]], axis=0)
+    # partition = 5
+    # df_list = metrics.cross_validation(data, partition)
+    # test = df_list[0]
+    # training = pd.DataFrame()
+    # for j in range(1, partition):
+    #       training = pd.concat([training, df_list[j]], axis=0)
 
-    attributes.remove(creditability) 
+    # attributes.remove(creditability) 
 
 
     #########################################################
     #execute ID3
-    values_per_atr = {}
-    for atr in attributes : 
-        values_per_atr[atr] = training[atr].unique()
-    father = id3_algorithm.id3(training,attributes,values_per_atr,None,None, None,None,None,None) #tree of the training
-    resolve_test(test, father)
+    # values_per_atr = {}
+    # for atr in attributes : 
+    #     values_per_atr[atr] = training[atr].unique()
+    # father = id3_algorithm.id3(training,attributes,values_per_atr,None,None, None,None,None,None) #tree of the training
+    # resolve_test(test, father)
     # draw_tree.graph_tree(father)
     # print(id3_algorithm.count_nodes(father))
     
