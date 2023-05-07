@@ -12,7 +12,7 @@ random.seed(SEED)
 
 def bagging(dataset, k,seed):
     df_list = []
-    split_size = int(dataset.shape[0])
+    split_size = int(dataset.shape[0]*0.8)
     for i in range(k):
         df_list.append(dataset.sample(random_state=seed, n=split_size, replace=True).reset_index(drop=True))
 

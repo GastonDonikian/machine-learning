@@ -12,7 +12,7 @@ from collections import defaultdict
 
 
 
-def random_forest(training,attributes,tree_count,max,filter_min_data,filter_gain, filter_probability,max_nodes, seed):
+def random_forest(training,attributes,tree_count,max,filter_min_data,filter_gain, filter_probability,max_nodes, seed=None):
     nodes_fathers =[]
     df_list = metrics.bagging(training,tree_count,seed)
 
