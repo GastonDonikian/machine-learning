@@ -1,35 +1,44 @@
-import random
-from typing import Callable
-import matplotlib.pyplot as plt
+from sklearn import svm
+from PIL import Image
+import numpy as np
+from sklearn import svm
+from sklearn.datasets import make_classification
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score
 
 
-def generate_points_linearly_separable(x_range: (int, int) = (0, 5),
-                                       y_range: (int, int) = (0, 5),
-                                       n: int = 100,
-                                       f: Callable[[int], int] = (lambda x: x)) -> ([(float, float)], [(float, float)]):
-    category_one = []
-    category_minus_one = []
-    # No dice que tiene que estar balanceado
-    # si asi fuese se puede agregar una condicion medio boluda
-    # si se demora mucho se puede hacer en n repes con un linspace sobre la curva y despues un
-    # random entre el punto - el rango, pero me da fiaca codear eso,
-    # asi que no optimicen prematuramente
-    for i in range(n):
-        new_point = (random.uniform(*x_range), random.uniform(*y_range))
-        if is_point_greater_than(f=f, point=new_point):
-            category_one.append(new_point)
-        else:
-            category_minus_one.append(new_point)
-    return category_one, category_minus_one
+def svm_classifier(x, y):
+    # Create an SVM classifier
+    clf = svm.SVC()
+    # Split the data into training and testing sets
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
+    # Train the classifier
+    clf.fit(x_train, y_train)
+    y_pred = clf.predict(x_test)
+    # Calculate the accuracy of the classifier
+    accuracy = accuracy_score(y_test, y_pred)
+    print("Accuracy:", accuracy)
 
-
-# Greater than implica que el punto esta a la derecha de la linea
-def is_point_greater_than(f: Callable[[int], int], point: (int, int)):
-    # https://math.stackexchange.com/questions/324589/detecting-whether-a-point-is-above-or-below-a-slope
-    return f(point[0]) > point[1]
+def get_pixels(imagepath):
+    img = Image.open(imagepath)
+    im_matrix = np.array(img)
+    return im_matrix.reshape(-1, 3)
 
 if __name__ == '__main__':
-    category_one, category_minus_one = generate_points_linearly_separable(f=lambda x: 4)
-    plt.scatter(*zip(*category_one), color='red')
-    plt.scatter(*zip(*category_minus_one), color='blue')
-    plt.show()
+    sky_matrix = get_pixels('./resources/cielo.jpg')
+    cow_matrix = get_pixels('./resources/vaca.jpg')
+    grass_matrix = get_pixels('./resources/pasto.jpg')
+
+    images = [sky_matrix, cow_matrix, grass_matrix]
+    target_labels = [0, 1, 2]
+    y = np.concatenate([np.full(p.shape[0], label) for p, label in zip(images, target_labels)])
+    svm_classifier(np.concatenate(images), y)
+
+    #pixel_list = list(map(lambda x: (x,0),sky_matrix))
+    #pixel_list.append(list(map(lambda x: (x,1),cow_matrix)))
+    #pixel_list.append(list(map(lambda x: (x,2),grass_matrix)))
+    #print(pixel_list)
+    #svm_clasifier(pixel_list)
+
+    
+    

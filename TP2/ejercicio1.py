@@ -486,8 +486,12 @@ def plot_Random_forest_max_nodes(data):
 
 def heatmap_matrix(conf_matrix):
     # create heatmap
+    
     sns.heatmap(conf_matrix, annot=True)
+    # Convert scientific notation to decimal notation
+    fmt = ticker.FuncFormatter(lambda x, pos: '{:.2f}'.format(x))
     plt.title('Confusion Matrix')
+    plt.gca().yaxis.set_major_formatter(fmt)
     plt.show()
 
 
