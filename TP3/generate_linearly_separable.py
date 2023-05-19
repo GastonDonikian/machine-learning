@@ -3,9 +3,11 @@ from typing import Callable
 import matplotlib.pyplot as plt
 
 
+
 def generate_points_linearly_separable(x_range: (int, int) = (0, 5),
                                        y_range: (int, int) = (0, 5),
                                        n: int = 100,
+                                       wrong: bool = False,
                                        f: Callable[[int], int] = (lambda x: x)) -> ([(float, float)], [(float, float)]):
     category_one = []
     category_minus_one = []
@@ -16,20 +18,32 @@ def generate_points_linearly_separable(x_range: (int, int) = (0, 5),
     # asi que no optimicen prematuramente
     for i in range(n):
         
-        new_point = get_new_point(x_range,y_range,f)
-        if is_point_greater_than(f=f, point=new_point):
-            category_one.append(new_point)
+        new_point, w = get_new_point(x_range,y_range,f,wrong)
+        if(not w):
+            if is_point_greater_than(f=f, point=new_point):
+                category_one.append(new_point)
+            else:
+                category_minus_one.append(new_point)
         else:
-            category_minus_one.append(new_point)
+            if is_point_greater_than(f=f, point=new_point):
+                category_minus_one.append(new_point)
+            else:
+                category_one.append(new_point)
+        
     return category_one, category_minus_one
 
-def get_new_point(x_range,y_range,f):
+def get_new_point(x_range,y_range,f,wrong):
     new_point = (random.uniform(*x_range), random.uniform(*y_range))
     delta = f(new_point[0]) - new_point[1]
-    while abs(delta) < 0.5:
+    condition = abs(delta) < 0.5
+    if(wrong and condition):
+        return new_point, wrong
+    
+    while condition:
         new_point = (random.uniform(*x_range), random.uniform(*y_range))
         delta = f(new_point[0]) - new_point[1]
-    return new_point
+        condition = abs(delta) < 0.5
+    return new_point, False
 
 # Greater than implica que el punto esta a la derecha de la linea
 def is_point_greater_than(f: Callable[[int], int], point: (int, int)):
