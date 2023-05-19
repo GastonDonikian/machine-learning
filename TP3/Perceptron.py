@@ -36,17 +36,16 @@ class Perceptron:
         O = self.activation(H)
         return H,O
 
-    def retropropagation(self, input, expected, O, learning_rate):
+    def backpropagation(self, input, expected, O, learning_rate):
         X = np.append(input,1)
         delta = [x*learning_rate*(expected - O) for x in X]
         return delta
 
     def error(self, dataset,O):
-        expected = np.array([x[1] for x in dataset])
         error = 0
         for index, data in enumerate(dataset):
-            for input, e in data:
-               error+=abs((e-O[index]))
+            input, e = data
+            error+=(abs((e-O[index]))/2)
         error = error/len(dataset)
         return error
     
@@ -54,22 +53,23 @@ class Perceptron:
 
     def train(self, dataset,  target_error=0, epochs=math.inf, learning_rate=0.1):
         errors = []
-        dataset = np.array(dataset, dtype=object)
+    
         error = math.inf
         while error > target_error and epochs > 0:
             epochs -= 1
             np.random.shuffle(dataset)
             outputs = []
             for data in dataset:
+            
                 deltas = []
-                for input, expected in data:
-                    H, O = self.feedforward(input)
-                    _deltas = self.retropropagation(input, expected, O, learning_rate)
-                    if deltas:
-                        deltas += _deltas
-                    else:
-                        deltas = _deltas
-                    outputs.append(O)
+                input, expected = data
+                H, O = self.feedforward(input)
+                _deltas = self.backpropagation(input, expected, O, learning_rate)
+                if deltas:
+                    deltas += _deltas
+                else:
+                    deltas = _deltas
+                outputs.append(O)
                 for i in range(len(self.weights)):
                     self.weights[i] += deltas[i]
 
@@ -80,4 +80,4 @@ class Perceptron:
 	
 
 if __name__ == '__main__':
-    print("hi")
+    print("hola soy un perceptron")
