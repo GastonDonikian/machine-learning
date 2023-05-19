@@ -15,13 +15,21 @@ def generate_points_linearly_separable(x_range: (int, int) = (0, 5),
     # random entre el punto - el rango, pero me da fiaca codear eso,
     # asi que no optimicen prematuramente
     for i in range(n):
-        new_point = (random.uniform(*x_range), random.uniform(*y_range))
+        
+        new_point = get_new_point(x_range,y_range,f)
         if is_point_greater_than(f=f, point=new_point):
             category_one.append(new_point)
         else:
             category_minus_one.append(new_point)
     return category_one, category_minus_one
 
+def get_new_point(x_range,y_range,f):
+    new_point = (random.uniform(*x_range), random.uniform(*y_range))
+    delta = f(new_point[0]) - new_point[1]
+    while abs(delta) < 0.5:
+        new_point = (random.uniform(*x_range), random.uniform(*y_range))
+        delta = f(new_point[0]) - new_point[1]
+    return new_point
 
 # Greater than implica que el punto esta a la derecha de la linea
 def is_point_greater_than(f: Callable[[int], int], point: (int, int)):

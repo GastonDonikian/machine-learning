@@ -75,7 +75,7 @@ class Perceptron:
 
             error = self.error(dataset,outputs)
             errors.append(error)
-        return errors
+        return errors, self.weights
 
 	
 
