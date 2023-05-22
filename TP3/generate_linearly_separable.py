@@ -43,6 +43,7 @@ def get_new_point(x_range,y_range,f,wrong):
         new_point = (random.uniform(*x_range), random.uniform(*y_range))
         delta = f(new_point[0]) - new_point[1]
         condition = abs(delta) < 0.5
+        
     return new_point, False
 
 # Greater than implica que el punto esta a la derecha de la linea

@@ -17,7 +17,7 @@ activations_gens = { 'step': step_gen}
 class Perceptron:
 
 
-    def __init__(self, x_lenght=2,  activation='sigmoid', seed=1, args={}):
+    def __init__(self, x_lenght=2,  activation='step', seed=1, args={}):
         self.structure = x_lenght + 1 #add bias
         self.activation = activations_gens.get(activation)(args)
 
@@ -78,6 +78,10 @@ class Perceptron:
         return errors, self.weights
 
 	
+def optimal_hyperplane(category_one, category_minus_one, weights):
+
+    print("hacer el hiperplano optimo")
+
 
 if __name__ == '__main__':
     print("hola soy un perceptron")
