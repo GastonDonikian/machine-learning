@@ -77,10 +77,6 @@ class Perceptron:
             errors.append(error)
         return errors, self.weights
 
-	
-def optimal_hyperplane(category_one, category_minus_one, weights):
-
-    print("hacer el hiperplano optimo")
 
 
 if __name__ == '__main__':

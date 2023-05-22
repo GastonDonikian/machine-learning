@@ -8,7 +8,9 @@ def generate_points_linearly_separable(x_range: (int, int) = (0, 5),
                                        y_range: (int, int) = (0, 5),
                                        n: int = 100,
                                        wrong: bool = False,
+                                       seed: int= 10,
                                        f: Callable[[int], int] = (lambda x: x)) -> ([(float, float)], [(float, float)]):
+    random.seed(seed)
     category_one = []
     category_minus_one = []
     # No dice que tiene que estar balanceado
