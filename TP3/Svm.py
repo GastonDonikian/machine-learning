@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class SVM: 
-    def __init__(self, c= 1, kw=0.001, kb=0.05, seed=0, learning_rate = 0.00001):
+    def __init__(self, c= 10, kw=0.001, kb=0.05, seed=0, learning_rate = 0.00001):
         self.c = c
         self.kw = kw
         self.kb = kb
@@ -21,7 +21,7 @@ class SVM:
         
 
     def svg_one_sample(self, dataset):
-        self.weights = self.rng.uniform(-1, 1, 2)
+        self.weights = np.random.rand(2)
         b = 0
         prev_cost = float("inf")
         initial_rate = self.learning_rate 

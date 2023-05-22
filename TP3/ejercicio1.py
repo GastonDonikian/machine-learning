@@ -36,8 +36,8 @@ if __name__ == '__main__':
     # plt.show()
 
     ##EJ 1.4
-    category_one, category_minus_one = ls.generate_points_linearly_separable(f=lambda x: x)
-    #category_one, category_minus_one = ls.generate_points_linearly_separable(wrong=True, f=lambda x: x)
+    #category_one, category_minus_one = ls.generate_points_linearly_separable(f=lambda x: x)
+    category_one, category_minus_one = ls.generate_points_linearly_separable(wrong=True, f=lambda x: x) 
     plt.scatter(*zip(*category_one), color='red')
     plt.scatter(*zip(*category_minus_one), color='blue')
     
