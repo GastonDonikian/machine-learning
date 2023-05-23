@@ -4,6 +4,7 @@ import copy
 import random
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.ticker import ScalarFormatter
 
 iterations = 10
 SEED = 5017
@@ -32,19 +33,20 @@ def plot_confusion_matrix(conf_matrix):
     # first param - confusion matrix in array format
     # annot = True: show the numbers in each heatmap cell
     # fmt = 'd': show numbers as integers.
-    ax = sns.heatmap(conf_matrix, annot=True)
+    ax = sns.heatmap(conf_matrix, annot=True, fmt='g')
 
     # set x-axis label and ticks.
-    ax.set_xlabel("Predicted Stars", fontsize=14, labelpad=20)
-    ax.xaxis.set_ticklabels(['1 Star', '2 Star','3 Star','4 Star','5 Star'])
+    ax.set_xlabel("Predicted", fontsize=14, labelpad=20)
+    ax.xaxis.set_ticklabels(['Pasto', 'Vaca', 'Cielo'])
 
     # set y-axis label and ticks
-    ax.set_ylabel("Actual Stars", fontsize=14, labelpad=20)
-    ax.yaxis.set_ticklabels(['1 Star', '2 Star','3 Star','4 Star','5 Star'])
+    ax.set_ylabel("Actual", fontsize=14, labelpad=20)
+    ax.yaxis.set_ticklabels(['Pasto', 'Vaca', 'Cielo'])
 
     # set plot title
-    ax.set_title("Confusion Matrix for Stars Rating.", fontsize=14, pad=20)
-    plt.savefig('./images/standarized_scale_confusion_matrix.png', bbox_inches='tight')
+    ax.set_title("Confusion Matrix.", fontsize=14, pad=20)
+
+    plt.savefig('./images/pasto_vaca_cielo_confusion_matrix.png', bbox_inches='tight')
     plt.show()
 
 
@@ -86,7 +88,7 @@ def confusion_matrix(classes, predicted, expected):
     matrix = np.zeros((len(classes), len(classes)))
     for i, j in zip(expected, predicted):
         # print(f"Expected: {i}, Predicted: {j}")
-        matrix[get_index(i)][get_index(j)] += 1
+        matrix[i][j] += 1
     return matrix
 
 
