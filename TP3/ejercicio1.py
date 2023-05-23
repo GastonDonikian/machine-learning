@@ -9,7 +9,6 @@ import numpy as np
 
 def distance_point_to_line(point, line):
     p = np.array(point)
-    #a, b, c = line #ax +by + c = 0
     return abs(line[0] * p[0] + line[1] * p[1] + line[2]) / np.sqrt(line[0]*2 + line[1]*2)
 
 def find_nearest_points(points, line):
@@ -18,7 +17,6 @@ def find_nearest_points(points, line):
     nearest_points = [points[idx] for idx in sorted_indices[:3]]
     return nearest_points
 
-	
 def optimal_hyperplane(category_one, category_minus_one,weights,seed=200):
     random.seed(seed)
     #random_choice_o = random.choices(category_one, k=2)
@@ -27,15 +25,21 @@ def optimal_hyperplane(category_one, category_minus_one,weights,seed=200):
     near_point_minus = find_nearest_points(category_minus_one,weights)
     random_choice_o = random.choices(near_point_one, k=2)
     random_choice_m = random.choices(near_point_minus, k=1)
+    #agarro dos puntos de la clase 1
     x1, y1 = random_choice_o[0]
     x2, y2 = random_choice_o[1]
+
+    #agarro uno de la clase -1
     xb, yb = random_choice_m[0]
-    #pendiente y b recta de los puntos de la clase a
+
+    #pendiente y b recta de los puntos de la clase 1
     m = (y2 - y1) / (x2 - x1)
+
     #PUNTOMEDIO DE los puntos
     xm = (x1 + x2) / 2
     ym = (y1 + y2) / 2
-    #PUNTOMEDIO entre el punto de la clase b y el punto medio entre los puntos de la clase a
+
+    #PUNTOMEDIO entre el punto de la clase -1 y el punto medio entre los puntos de la clase 1
     xm_mid = (xm + xb) / 2
     ym_mid = (ym + yb) / 2
 
@@ -43,10 +47,9 @@ def optimal_hyperplane(category_one, category_minus_one,weights,seed=200):
 
     return m,b_mid
 
-if __name__ == '__main__':
-    ##EJ 1.1
+def ej1y2():
     category_one, category_minus_one = ls.generate_points_linearly_separable(seed=10,f=lambda x: x)
-    
+
     dataset = []
     dataset += [[x, 1] for x in category_one]
     dataset += [[x, -1] for x in category_minus_one]
@@ -67,35 +70,42 @@ if __name__ == '__main__':
     plt.grid()
     plt.show()
 
-    ##EJ 1.3
-    # category_one, category_minus_one = ls.generate_points_linearly_separable(wrong=True, f=lambda x: x)
-    # dataset = []
-    # dataset += [[x, 1] for x in category_one]
-    # dataset += [[x, -1] for x in category_minus_one]
-    # perceptron = p.Perceptron(2, activation='step', seed=1)
-    # error, weights = perceptron.train(dataset, learning_rate=1, epochs=100)
-    # plt.scatter(*zip(*category_one), color='red')
-    # plt.scatter(*zip(*category_minus_one), color='blue')
-    # x = np.linspace(0,5,2)
-    # y = (-weights[2] -weights[0]*x )/weights[1]
-    # plt.plot(x, y, '-g')
-    # plt.grid()
-    # plt.show()
+def ej3():
+     ##EJ 1.3
+    category_one, category_minus_one = ls.generate_points_linearly_separable(wrong=True, f=lambda x: x)
+    dataset = []
+    dataset += [[x, 1] for x in category_one]
+    dataset += [[x, -1] for x in category_minus_one]
+    perceptron = p.Perceptron(2, activation='step', seed=1)
+    error, weights = perceptron.train(dataset, learning_rate=1, epochs=100)
+    plt.scatter(*zip(*category_one), color='red')
+    plt.scatter(*zip(*category_minus_one), color='blue')
+    x = np.linspace(0,5,2)
+    y = (-weights[2] -weights[0]*x )/weights[1]
+    plt.plot(x, y, '-g')
+    plt.grid()
+    plt.show()
 
-    ##EJ 1.4
-    ##TODO: GRAFICOS DE VALIDACIÓN CRUZADA PARA SACAR EL C OPTIMO, (KW Y KB CONJUNTO)
-    #category_one, category_minus_one = ls.generate_points_linearly_separable(f=lambda x: x)
-    # category_one, category_minus_one = ls.generate_points_linearly_separable(wrong=True, f=lambda x: x) 
-    # plt.scatter(*zip(*category_one), color='red')
-    # plt.scatter(*zip(*category_minus_one), color='blue')
-    
-    # dataset = []
-    # dataset += [[x, 1] for x in category_one]
-    # dataset += [[x, -1] for x in category_minus_one]
-    # svm = s.SVM()
-    # weights, b = svm.svg_one_sample(dataset,2)
-    # x = np.linspace(0,5,2)
-    # y = (-b -weights[0]*x )/weights[1]
-    # plt.plot(x, y, '-g')
-    # plt.grid()
-    # plt.show()
+def ej4():
+    category_one, category_minus_one = ls.generate_points_linearly_separable(f=lambda x: x)
+    category_one, category_minus_one = ls.generate_points_linearly_separable(wrong=True, f=lambda x: x)
+    plt.scatter(*zip(*category_one), color='red')
+    plt.scatter(*zip(*category_minus_one), color='blue')
+
+    dataset = []
+    dataset += [[x, 1] for x in category_one]
+    dataset += [[x, -1] for x in category_minus_one]
+    svm = s.SVM()
+    weights, b = svm.svg_one_sample(dataset,2)
+    x = np.linspace(0,5,2)
+    y = (-b -weights[0]*x )/weights[1]
+    plt.plot(x, y, '-g')
+    plt.grid()
+    plt.show()
+
+if __name__ == '__main__':
+    ##EJ 1.1
+    #ej1y2()
+    #ej3()
+    ej4()
+  
