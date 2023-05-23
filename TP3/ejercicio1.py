@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import Svm as s
 import random
-
+import metrics as m
 import numpy as np
 
 def distance_point_to_line(point, line):
@@ -89,19 +89,29 @@ def ej3():
 def ej4():
     category_one, category_minus_one = ls.generate_points_linearly_separable(f=lambda x: x)
     category_one, category_minus_one = ls.generate_points_linearly_separable(wrong=True, f=lambda x: x)
-    plt.scatter(*zip(*category_one), color='red')
-    plt.scatter(*zip(*category_minus_one), color='blue')
-
+   
+   
+    
     dataset = []
     dataset += [[x, 1] for x in category_one]
     dataset += [[x, -1] for x in category_minus_one]
-    svm = s.SVM()
-    weights, b = svm.svg_one_sample(dataset,2)
-    x = np.linspace(0,5,2)
-    y = (-b -weights[0]*x )/weights[1]
-    plt.plot(x, y, '-g')
-    plt.grid()
-    plt.show()
+
+    dataset = m.cross_validation(dataset,6)
+    for i in range(6):
+        test, training = m.choose_test(i,dataset)
+        svm = s.SVM()
+        weights, b = svm.svg_one_sample(training,2)
+        x = np.linspace(0,5,2)
+        y = (-b -weights[0]*x )/weights[1]
+        plt.plot(x, y, '-g')
+        plt.scatter(*zip(*category_one), color='red')
+        plt.scatter(*zip(*category_minus_one), color='blue')    
+        plt.grid()
+        plt.show()
+        print(s.compute_cost(weights,b,test))
+
+
+    
 
 if __name__ == '__main__':
     ##EJ 1.1
