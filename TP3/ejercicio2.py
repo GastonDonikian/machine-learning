@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 import Svm as s
 
 
-def svm_classifier(x, y,test_size,output):
+def svm_classifier(x, y,test_size,output): 
     # Create an SVM classifier
     clf = svm.SVC()
     # Split the data into training and testing sets

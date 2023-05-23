@@ -18,6 +18,7 @@ class Perceptron:
 
 
     def __init__(self, x_lenght=2,  activation='step', seed=1, args={}):
+        print("perceptron")
         self.structure = x_lenght + 1 #add bias
         self.activation = activations_gens.get(activation)(args)
 

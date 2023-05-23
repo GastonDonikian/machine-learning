@@ -9,7 +9,8 @@ import numpy as np
 
 def distance_point_to_line(point, line):
     p = np.array(point)
-    return abs(line[0] * p[0] + line[1] * p[1] + line[2]) / np.sqrt(line[0]*2 + line[1]*2)
+    a, b, c = line
+    return abs(a * p[0] + b* p[1] + c) / np.sqrt(a**2 + b**2)
 
 def find_nearest_points(points, line):
     distances = [distance_point_to_line(point, line) for point in points]
@@ -17,7 +18,7 @@ def find_nearest_points(points, line):
     nearest_points = [points[idx] for idx in sorted_indices[:3]]
     return nearest_points
 
-def optimal_hyperplane(category_one, category_minus_one,weights,seed=200):
+def optimal_hyperplane(category_one, category_minus_one,weights,seed=100):
     random.seed(seed)
     #random_choice_o = random.choices(category_one, k=2)
     #random_choice_m = random.choices(category_minus_one, k=1)
@@ -57,14 +58,16 @@ def ej1y2():
     error, weights = perceptron.train(dataset, learning_rate=1, epochs=1000)
     plt.scatter(*zip(*category_one), color='red')
     plt.scatter(*zip(*category_minus_one), color='blue')
-
+    plt.xlabel("X")
+    plt.ylabel("Y")
 
     x = np.linspace(0,5,2)
     y = (-weights[2] -weights[0]*x )/weights[1]
     m,b = optimal_hyperplane(category_one,category_minus_one,weights,40)
-    plt.plot(x, y, '-g')
+    plt.plot(x, y, '-g',label='perceptron')
     y_optimal=(m*x + b)
-    plt.plot(x, y_optimal, '-m')
+    plt.plot(x, y_optimal, '-m', label='near_optimal')
+    plt.legend()
     plt.xlim(-0.05, 5.05)  # Set the x-axis limits from 0 to 6
     plt.ylim(-0.05, 5.05)  # Set the y-axis limits from 0 to 12
     plt.grid()
@@ -83,38 +86,47 @@ def ej3():
     x = np.linspace(0,5,2)
     y = (-weights[2] -weights[0]*x )/weights[1]
     plt.plot(x, y, '-g')
+    plt.xlabel("X")
+    plt.ylabel("Y")
     plt.grid()
     plt.show()
 
 def ej4():
     category_one, category_minus_one = ls.generate_points_linearly_separable(f=lambda x: x)
-    category_one, category_minus_one = ls.generate_points_linearly_separable(wrong=True, f=lambda x: x)
-   
-   
-    
+    category_one, category_minus_one = ls.generate_points_linearly_separable( f=lambda x: x)
     dataset = []
     dataset += [[x, 1] for x in category_one]
     dataset += [[x, -1] for x in category_minus_one]
+    svm = s.SVM()
+    weights, b = svm.svg_one_sample(dataset,2)
+    x = np.linspace(0,5,2)
+    y = (-b -weights[0]*x )/weights[1]
+    plt.plot(x, y, '-g')
+    plt.scatter(*zip(*category_one), color='red')
+    plt.scatter(*zip(*category_minus_one), color='blue')    
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.grid()
+    plt.show()
 
-    dataset = m.cross_validation(dataset,6)
-    for i in range(6):
-        test, training = m.choose_test(i,dataset)
-        svm = s.SVM()
-        weights, b = svm.svg_one_sample(training,2)
-        x = np.linspace(0,5,2)
-        y = (-b -weights[0]*x )/weights[1]
-        plt.plot(x, y, '-g')
-        plt.scatter(*zip(*category_one), color='red')
-        plt.scatter(*zip(*category_minus_one), color='blue')    
-        plt.grid()
-        plt.show()
-        print(s.compute_cost(weights,b,test))
+    # dataset = m.cross_validation(dataset,6)
+    # for i in range(6):
+    #     test, training = m.choose_test(i,dataset)
+    #     svm = s.SVM()
+    #     weights, b = svm.svg_one_sample(training,2)
+    #     x = np.linspace(0,5,2)
+    #     y = (-b -weights[0]*x )/weights[1]
+    #     plt.plot(x, y, '-g')
+    #     plt.scatter(*zip(*category_one), color='red')
+    #     plt.scatter(*zip(*category_minus_one), color='blue')    
+    #     plt.grid()
+    #     plt.show()
+    #     print(s.compute_cost(weights,b,test))
 
 
     
 
 if __name__ == '__main__':
-    ##EJ 1.1
     #ej1y2()
     #ej3()
     ej4()
