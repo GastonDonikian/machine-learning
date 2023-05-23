@@ -53,7 +53,7 @@ class Perceptron:
 
     def train(self, dataset,  target_error=0, epochs=math.inf, learning_rate=0.1):
         errors = []
-    
+        
         error = math.inf
         while error > target_error and epochs > 0:
             epochs -= 1

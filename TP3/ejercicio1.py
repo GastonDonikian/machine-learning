@@ -77,7 +77,7 @@ if __name__ == '__main__':
     # dataset += [[x, 1] for x in category_one]
     # dataset += [[x, -1] for x in category_minus_one]
     # svm = s.SVM()
-    # weights, b = svm.svg_one_sample(dataset)
+    # weights, b = svm.svg_one_sample(dataset,2)
     # x = np.linspace(0,5,2)
     # y = (-b -weights[0]*x )/weights[1]
     # plt.plot(x, y, '-g')
