@@ -109,25 +109,37 @@ def ej4():
     plt.grid()
     plt.show()
 
-    # dataset = m.cross_validation(dataset,6)
-    # for i in range(6):
-    #     test, training = m.choose_test(i,dataset)
-    #     svm = s.SVM()
-    #     weights, b = svm.svg_one_sample(training,2)
-    #     x = np.linspace(0,5,2)
-    #     y = (-b -weights[0]*x )/weights[1]
-    #     plt.plot(x, y, '-g')
-    #     plt.scatter(*zip(*category_one), color='red')
-    #     plt.scatter(*zip(*category_minus_one), color='blue')    
-    #     plt.grid()
-    #     plt.show()
-    #     print(s.compute_cost(weights,b,test))
-
-
+def ej4_choose_c():
+    category_one, category_minus_one = ls.generate_points_linearly_separable(wrong=True,f=lambda x: x)
+    category_one, category_minus_one = ls.generate_points_linearly_separable(wrong=True,f=lambda x: x)
+    dataset = []
+    dataset += [[x, 1] for x in category_one]
+    dataset += [[x, -1] for x in category_minus_one]
     
+    svm = s.SVM()
+    weights, b = svm.svg_one_sample(dataset,2)
+    x = np.linspace(0,5,2)
+    y = (-b -weights[0]*x )/weights[1]
+    accuracy = []
+    c = np.logspace(-2,7,10)
+    for c_i in c:
+        svm = s.SVM(c=c_i,max_epochs=7000)
+        weights, b = svm.svg_one_sample(dataset,2)
+        accuracy.append(s.accuracy(weights=weights,b=b,dataset=dataset))
+        print(c_i,accuracy)
+
+    x = c
+    y = accuracy
+    plt.plot(x,y, ".-", color='m' )
+    plt.xlabel("c")
+    plt.ylabel("accurancy")
+    plt.grid()
+    plt.xscale('log')
+    plt.show()
 
 if __name__ == '__main__':
-    #ej1y2()
+    ej1y2()
     #ej3()
-    ej4()
+    #ej4()
+    #ej4_choose_c()
   

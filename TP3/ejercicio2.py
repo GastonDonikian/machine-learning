@@ -7,7 +7,7 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import Svm as s
-from TP3.metrics import confusion_matrix, plot_confusion_matrix
+from metrics import confusion_matrix, plot_confusion_matrix
 
 kernels = ['poly','linear','sigmoid', 'rbf']
 
