@@ -30,7 +30,7 @@ def svm_classifier(x, y, test_size, output, kernel):
         # Calculate the accuracy of the classifier
         accuracy = accuracy_score(y_test, y_pred)
         # plot_confusion_matrix(title=clf.kernel, conf_matrix=confusion_matrix([0, 1, 2], y_test, y_pred))
-        print("Accuracy:", accuracy)
+        #print("Accuracy:", accuracy)
         accuracy_array.append(accuracy)
         # y_pred = clf.predict(output)
 
@@ -77,7 +77,6 @@ if __name__ == '__main__':
     y = np.concatenate([np.full(p.shape[0], label) for p, label in zip(images, target_labels)])
     for i in kernels:
         output, accuracy_array, linspace = svm_classifier(np.concatenate(images), y, 0.2, cow, i)
-        print(i)
         plt.plot(linspace, accuracy_array, '-', label=i)
     plt.xlabel("C value")
     plt.ylabel("accuracy")
