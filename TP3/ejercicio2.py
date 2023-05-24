@@ -6,7 +6,7 @@ from sklearn.datasets import make_classification
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 import Svm as s
-from TP3.metrics import confusion_matrix, plot_confusion_matrix
+from metrics import confusion_matrix, plot_confusion_matrix
 
 
 def svm_classifier(x, y, test_size, output):
@@ -19,9 +19,9 @@ def svm_classifier(x, y, test_size, output):
     y_pred = clf.predict(x_test)
     # Calculate the accuracy of the classifier
     accuracy = accuracy_score(y_test, y_pred)
-    plot_confusion_matrix(confusion_matrix([0, 1, 2], y_test, y_pred))
+    #plot_confusion_matrix(confusion_matrix([0, 1, 2], y_test, y_pred))
     print("Accuracy:", accuracy)
-    # y_pred = clf.predict(output)
+    y_pred = clf.predict(output)
     return y_pred
 
 
@@ -54,14 +54,14 @@ if __name__ == '__main__':
     sky_matrix = get_pixels('./resources/cielo.jpg')
     cow_matrix = get_pixels('./resources/vaca.jpg')
     grass_matrix = get_pixels('./resources/pasto.jpg')
-    cow = get_pixels('./resources/cow.jpg')
-    image = Image.open('./resources/cow.jpg')
+    cow = get_pixels('./resources/vaca_marron.jpg')
+    image = Image.open('./resources/vaca_marron.jpg')
     width, height = image.size
     images = [sky_matrix, cow_matrix, grass_matrix]
     target_labels = [0, 1, 2]
     y = np.concatenate([np.full(p.shape[0], label) for p, label in zip(images, target_labels)])
     output = svm_classifier(np.concatenate(images), y, 0.2, cow)
-    # create_image_SVM(output,width,height)
+    create_image_SVM(output,width,height)
     # dataset = []
     # dataset += [[x, 0] for x in sky_matrix]
     # dataset += [[x, 1] for x in cow_matrix]

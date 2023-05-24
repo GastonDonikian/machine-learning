@@ -5,10 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class SVM: 
-    def __init__(self, c= 100, kw=0.001, kb=0.05, seed=0, initial_rate = 0.00001,max_epochs=10000):
+    def __init__(self, c= 100, seed=0, initial_rate = 0.00001,max_epochs=10000):
         self.c = c
-        self.kw = kw
-        self.kb = kb
         self.b = 0
         self.max_epochs = max_epochs
         self.seed = seed
@@ -27,8 +25,6 @@ class SVM:
         bestW = self.weights
         bestB = b
         for epoch in range(1, self.max_epochs):
-            self.kw -= self.kw / epoch
-            self.kb -= self.kb / epoch
             # Get one randon sample (stochastic)
             np.random.shuffle(dataset)
             input, expected = dataset[0]
@@ -78,3 +74,15 @@ def compute_cost(weights,b,dataset):
     return cost  
 
 
+def accuracy(weights, b, dataset):
+    good = 0
+    total = len(dataset)
+    for data in dataset:
+        input, expected = data
+        output  = np.dot(weights, input) + b
+        if (output*expected) > 0:
+            good+=1
+    
+    # Calcular el costo promedio dividiendo por el número de ejemplos de entrenamiento
+    result = good/ total
+    return result  
