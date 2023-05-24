@@ -22,7 +22,7 @@ def choose_test(index,dataset):
     training = np.concatenate(dataset)
     return test, training 
 
-def plot_confusion_matrix(conf_matrix):
+def plot_confusion_matrix(title, conf_matrix):
     # Change figure size and increase dpi for better resolution
     plt.figure(figsize=(8, 6), dpi=100)
     # Scale up the size of all text
@@ -44,9 +44,9 @@ def plot_confusion_matrix(conf_matrix):
     ax.yaxis.set_ticklabels(['Pasto', 'Vaca', 'Cielo'])
 
     # set plot title
-    ax.set_title("Confusion Matrix.", fontsize=14, pad=20)
+    ax.set_title(title + " confusion matrix", fontsize=14, pad=20)
 
-    plt.savefig('./images/pasto_vaca_cielo_confusion_matrix.png', bbox_inches='tight')
+    plt.savefig('./images/' + title + '_pasto_vaca_cielo_confusion_matrix.png', bbox_inches='tight')
     plt.show()
 
 
