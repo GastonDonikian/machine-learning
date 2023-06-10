@@ -13,7 +13,7 @@ def _calculate_distance(point_1, point_2):
     return np.sqrt(np.sum((point_1 - point_2) ** 2))
 
 
-def k_means(data, k, iterations=100, threshold=0.1):
+def k_means(data, k, iterations=100, threshold=0.001):
     # Me traigo k centroides 'random', o sea, elijo k puntos
     centroids = _get_k_centroids(data, k)
 
