@@ -1,7 +1,9 @@
 import math
 import random
+import sys
 
 import numpy as np
+from numpy import floor
 
 
 def _calculate_distance(point_1, point_2):
@@ -34,9 +36,11 @@ def _calculate_winning_neuron_update(example, weight, learning_rate):
 
 
 def _calculate_losing_neuron_update(example, weight, learning_rate, radius):
+    if radius == 0:
+        return weight
     distance = _calculate_distance(example, weight)
-    V_factor = math.exp((-2 * distance) / radius)
-    return learning_rate * V_factor * distance * (example - weight)
+    v_factor = math.exp((-2 * distance) / radius)
+    return learning_rate * v_factor * distance * (example - weight)
 
 
 def kohonen_som(training_set, epochs=2000, learning_rate=0.5, vicinity_radius=3):
@@ -44,8 +48,9 @@ def kohonen_som(training_set, epochs=2000, learning_rate=0.5, vicinity_radius=3)
         raise ValueError("Training set can't be empty!")
     dimension = len(training_set[0])
     weight_matrix = _initialize_weight_matrix(dimension=dimension)
-    rows, cols = weight_matrix.shape
+    rows, cols, n_array = weight_matrix.shape
     for epoch in range(epochs):
+        print((epoch/epochs)*100, end="\r")
         # EXAMPLE SHOULD BE A NP ARRAY!!!
         for example in training_set:
             # Saco al ganador
@@ -56,17 +61,17 @@ def kohonen_som(training_set, epochs=2000, learning_rate=0.5, vicinity_radius=3)
                 weight=weight_matrix[w_row][w_col],
                 learning_rate=learning_rate)
             # Actualizo neuronas perdedoras
-            for i in range(max(0, w_row - vicinity_radius), min(rows, w_row + vicinity_radius + 1)):
-                for j in range(max(0, w_col - vicinity_radius), min(cols, w_col + vicinity_radius + 1)):
+            for i in range(max(0, w_row - floor(vicinity_radius)), min(rows, w_row + floor(vicinity_radius) + 1)):
+                for j in range(max(0, w_col - floor(vicinity_radius)), min(cols, w_col + floor(vicinity_radius) + 1)):
                     if i == w_row and j == w_col:
                         pass
                     weight_matrix[i][j] = _calculate_losing_neuron_update(
                         example=example,
                         weight=weight_matrix[i][j],
                         learning_rate=learning_rate,
-                        radius=_calculate_distance(np.array(i, j), np.array(w_col, w_row)))
+                        radius=_calculate_distance(np.array((i, j)), np.array((w_col, w_row))))
         learning_rate = 0.1 * (1 - epoch / epochs)
-        vicinity_radius = (epochs - epoch) * vicinity_radius / epochs
+        # vicinity_radius = (epochs - epoch) * vicinity_radius / epochs
     return weight_matrix
 
 
