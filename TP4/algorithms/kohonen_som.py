@@ -21,8 +21,8 @@ def _find_bmu(example, weights):
             if distance < min_distance:
                 min_distance = distance
                 bmu_index = (i, j)
-
-    return bmu_index
+    w_row, w_col = bmu_index
+    return w_row, w_col,min_distance
 
 
 def _initialize_weight_matrix(dimension=2, rows=5, cols=5):
@@ -43,18 +43,22 @@ def _calculate_losing_neuron_update(example, weight, learning_rate, radius):
     return learning_rate * v_factor * distance * (example - weight)
 
 
-def kohonen_som(training_set, epochs=2000, learning_rate=0.5, vicinity_radius=3):
+def kohonen_som(training_set, epochs=2000, eta=0.5, vicinity_radius=3):
     if training_set is None or len(training_set) == 0:
         raise ValueError("Training set can't be empty!")
     dimension = len(training_set[0])
     weight_matrix = _initialize_weight_matrix(dimension=dimension)
     rows, cols, n_array = weight_matrix.shape
+    mean_distances_per_epoch = []
+    learning_rate = eta
     for epoch in range(epochs):
-        print((epoch/epochs)*100, end="\r")
+        print(str((epoch/epochs)*100) + "%", end="\r")
         # EXAMPLE SHOULD BE A NP ARRAY!!!
+        min_distaces = []
         for example in training_set:
             # Saco al ganador
-            w_row, w_col = _find_bmu(example=example, weights=weight_matrix)
+            w_row, w_col, min_distance = _find_bmu(example=example, weights=weight_matrix)
+            min_distaces.append(min_distance)
             # Actualizo neurona ganadora
             weight_matrix[w_row][w_col] = _calculate_winning_neuron_update(
                 example=example,
@@ -70,9 +74,10 @@ def kohonen_som(training_set, epochs=2000, learning_rate=0.5, vicinity_radius=3)
                         weight=weight_matrix[i][j],
                         learning_rate=learning_rate,
                         radius=_calculate_distance(np.array((i, j)), np.array((w_col, w_row))))
-        learning_rate = 0.1 * (1 - epoch / epochs)
+        learning_rate = eta * (1 - epoch / epochs)
+        mean_distances_per_epoch.append(sum(min_distaces)/len(min_distaces))
         # vicinity_radius = (epochs - epoch) * vicinity_radius / epochs
-    return weight_matrix
+    return weight_matrix,mean_distances_per_epoch
 
 
 def predict(example, trained_matrix):

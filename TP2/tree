@@ -1,0 +1,52 @@
+digraph {
+	node [shape=oval]
+	3232368988640 [label=None]
+	node [shape=oval]
+	3232571749664 [label="Account Balance = 4"]
+	3232368988640 -> 3232571749664
+	node [shape=oval]
+	3232571750960 [label="Purpose = 3"]
+	3232571749664 -> 3232571750960
+	node [shape=oval]
+	3232571752352 [label="Creditability = 1"]
+	3232571750960 -> 3232571752352
+	node [shape=oval]
+	3232572080720 [label="Creditability = 1"]
+	3232571749664 -> 3232572080720
+	node [shape=oval]
+	3232571752064 [label="Account Balance = 1"]
+	3232368988640 -> 3232571752064
+	node [shape=oval]
+	3232571749904 [label="Duration of Credit (month) = 4"]
+	3232571752064 -> 3232571749904
+	node [shape=oval]
+	3232572081488 [label="Creditability = 0"]
+	3232571749904 -> 3232572081488
+	node [shape=oval]
+	3232572081056 [label="Creditability = 0"]
+	3232571752064 -> 3232572081056
+	node [shape=oval]
+	3232571751584 [label="Account Balance = 2"]
+	3232368988640 -> 3232571751584
+	node [shape=oval]
+	3232571750384 [label="Most valuable available asset = 1"]
+	3232571751584 -> 3232571750384
+	node [shape=oval]
+	3232572080768 [label="Creditability = 1"]
+	3232571750384 -> 3232572080768
+	node [shape=oval]
+	3232572080624 [label="Creditability = 1"]
+	3232571751584 -> 3232572080624
+	node [shape=oval]
+	3232571751920 [label="Account Balance = 3"]
+	3232368988640 -> 3232571751920
+	node [shape=oval]
+	3232571750576 [label="Most valuable available asset = 1"]
+	3232571751920 -> 3232571750576
+	node [shape=oval]
+	3232572080960 [label="Creditability = 1"]
+	3232571750576 -> 3232572080960
+	node [shape=oval]
+	3232572080576 [label="Creditability = 1"]
+	3232571751920 -> 3232572080576
+}

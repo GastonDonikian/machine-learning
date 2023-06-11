@@ -1,0 +1,57 @@
+Timer unit: 1 s
+
+Total time: 0.468622 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP4\algorithms\hierarchical_clustering.py
+Function: hierarchical_clustering at line 44
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    44                                           def hierarchical_clustering(points,calculate_distance='min'):
+    45         1          0.0      0.0      0.0      threshold = 0.0001
+    46         1          0.0      0.0      0.5      distance_matrix = _get_distance_matrix(points=points)
+    47         1          0.0      0.0      0.0      final_clusters = []
+    48                                               # Cada cluster es un array con un unico elemento, ahora tengo que mergear
+    49         1          0.0      0.0      0.0      clusters = [[(points[i],i)] for i in range(len(points))]
+    50         1          0.0      0.0      0.0      clusters = np.array(clusters, dtype=object)
+    51        48          0.0      0.0      0.0      while len(clusters) > 1:
+    52        48          0.0      0.0      0.0          min_distance = np.inf
+    53        48          0.0      0.0      0.0          distance = min_distance
+    54        48          0.0      0.0      0.0          merge_indices = None
+    55        48          0.0      0.0      0.0          i=0
+    56      1224          0.0      0.0      0.1          for i in range(len(clusters)):
+    57     19600          0.0      0.0      1.5              for j in range(i + 1,len(clusters)):
+    58     19600          0.4      0.0     93.8                  distance = calculate_distance_clusters.get(calculate_distance)(distance_matrix,clusters[i],clusters[j])
+    59     19265          0.0      0.0      1.8                  if distance < min_distance:
+    60       335          0.0      0.0      0.0                      min_distance = distance
+    61                                                               # me guardo la tupla de indices
+    62       335          0.0      0.0      0.0                      merge_indices = (i, j)
+    63     19600          0.0      0.0      1.9                  if min_distance < threshold:
+    64                                                               break
+    65                                                   # Merge the closest clusters
+    66        48          0.0      0.0      0.1          merged_cluster = np.concatenate((clusters[merge_indices[0]], clusters[merge_indices[1]]))
+    67        48          0.0      0.0      0.1          clusters = [c for idx, c in enumerate(clusters) if idx not in merge_indices]
+    68        48          0.0      0.0      0.0          clusters.append(merged_cluster)
+    69        48          0.0      0.0      0.0          final_clusters.append(merged_cluster)
+    70                                                  
+    71                                                  
+    72                                              
+    73         1          0.0      0.0      0.0      return final_clusters
+
+Total time: 1.34399 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP4\preprocess.py
+Function: main at line 54
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    54                                           def main():
+    55         1          0.1      0.1      6.0      data = preprocess_csv()
+    56         1          0.0      0.0      0.0      cut_length = len(data) // 100
+    57         1          0.0      0.0      0.0      cut_array = data[:cut_length]
+    58         1          1.3      1.3     94.0      hierarchical(cut_array)
+    59                                               
+    60                                               # trained_matrix = kohonen_som(training_set=data,
+    61                                               #                              epochs=20,
+    62                                               #                              learning_rate=0.1,
+    63                                               #                              vicinity_radius=5)
+    64                                               # predict(example=data[0], trained_matrix=trained_matrix)
+

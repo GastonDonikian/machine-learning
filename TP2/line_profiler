@@ -1,0 +1,189 @@
+Timer unit: 1 s
+
+Total time: 0.0123055 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: entropy at line 63
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    63                                           def entropy(probabilities):
+    64      2092          0.0      0.0      7.4      en = 0
+    65      4184          0.0      0.0     20.2      for p in probabilities:
+    66      2422          0.0      0.0     10.2          if p != 0:
+    67      1762          0.0      0.0     54.7              en -= p * math.log2(p)
+    68      2092          0.0      0.0      7.4      return en
+
+Total time: 0.0438138 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: gain at line 70
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    70                                           def gain(relative_probs_value, values,g):
+    71       568          0.0      0.0      0.9      entropies = []
+    72      2091          0.0      0.0      3.0      for value in values:
+    73      2091          0.0      0.0     88.0          e= entropy(relative_probs_value.get(value)[1:])
+    74      2091          0.0      0.0      4.5          g -= relative_probs_value.get(value)[0] *  e
+    75      2091          0.0      0.0      2.9          entropies.append(e)
+    76                                               
+    77       568          0.0      0.0      0.7      return g, entropies
+
+Total time: 0 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: set_probabilities at line 86
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    86                                           def set_probabilities(training,attr_name,values):
+    87                                               relative_probs_value = {}
+    88                                               for value in values:
+    89                                                   mask = training[attr_name] == value
+    90                                                   training_filter = training[mask]
+    91                                                   relative_probs_value[value] = []
+    92                                                   mask = training_filter[creditability] == 0
+    93                                                   crediatability_filter = training_filter[mask]
+    94                                                   relative_probs_value[value].append(calculate_probability(training_filter.shape[0],training.shape[0]))
+    95                                                   relative_probs_value[value].append(calculate_probability(crediatability_filter.shape[0],training_filter.shape[0]))
+    96                                                   relative_probs_value[value].append(calculate_probability(training_filter.shape[0]-crediatability_filter.shape[0],training_filter.shape[0]))
+    97                                               return relative_probs_value
+
+Total time: 0.248925 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: calculate_max_gain_and_entropies at line 137
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   137                                           def calculate_max_gain_and_entropies(probability_dict_attribute, father_g, total):
+   138       568          0.0      0.0      0.2      max_gain = 0
+   139       568          0.0      0.0      0.1      attribute_max_gain = None
+   140       568          0.0      0.0      0.1      entropies = []
+   141      6289          0.0      0.0      1.2      for key in probability_dict_attribute:
+   142      6289          0.0      0.0      1.5         probabilities_dict = {}
+   143     28363          0.0      0.0      7.8         for key_value in probability_dict_attribute[key]:
+   144     28363          0.0      0.0      4.2              creditability_0 = 0
+   145     28363          0.0      0.0      4.7              creditability_1 = 0
+   146     28363          0.0      0.0      8.0              creditability_0 = probability_dict_attribute[key][key_value][0]
+   147     28363          0.0      0.0      7.5              creditability_1 = probability_dict_attribute[key][key_value][1]
+   148     28363          0.0      0.0      4.4              probabilities = []
+   149     28363          0.0      0.0      5.8              creditability_sum = creditability_0 + creditability_1
+   150     15484          0.0      0.0      2.5              if creditability_sum != 0:
+   151     15484          0.0      0.0      4.3                  probabilities.append(creditability_sum/total)
+   152     15484          0.0      0.0      3.7                  probabilities.append(creditability_0/creditability_sum)
+   153     15484          0.0      0.0      4.3                  probabilities.append(creditability_1/creditability_sum)
+   154                                                       else: #Si el atributo da 0?
+   155     12879          0.0      0.0      3.6                  probabilities.append(creditability_sum/total)
+   156     12879          0.0      0.0      2.9                  probabilities.append(creditability_sum)
+   157     12879          0.0      0.0      2.7                  probabilities.append(creditability_sum)
+   158                                           
+   159     28363          0.0      0.0      7.5              probabilities_dict[key_value] = probabilities
+   160       568          0.1      0.0     22.6      g, e = gain(probabilities_dict, probability_dict_attribute[key].keys(), father_g)
+   161       568          0.0      0.0      0.2      if max_gain <= g:
+   162       568          0.0      0.0      0.1          max_gain = g
+   163       568          0.0      0.0      0.1          attribute_max_gain = key
+   164       568          0.0      0.0      0.1          entropies = e  
+   165                                               
+   166       568          0.0      0.0      0.1      return attribute_max_gain, entropies, max_gain
+
+Total time: 0 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: calculate_gain_and_entropy at line 168
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   168                                           def calculate_gain_and_entropy(training,attribute,value,father):
+   169                                               
+   170                                               if father is not None and father.value is not None:
+   171                                                   father_g = father.get_entropy()
+   172                                               else:
+   173                                                   probabilities = []
+   174                                                   crediatability_filter = training.loc[training[creditability] == 0]
+   175                                                   probabilities.append(crediatability_filter.shape[0]/training.shape[0])
+   176                                                   probabilities.append((training.shape[0]-crediatability_filter.shape[0])/training.shape[0])
+   177                                                   father_g = entropy(probabilities)
+   178                                           
+   179                                               relative_probs_value = set_probabilities(training,attribute, value)
+   180                                               g, e = gain(relative_probs_value,value, father_g)
+   181                                           
+   182                                               return g, e
+
+Total time: 8.16043 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: id3 at line 208
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   208                                           def id3(training, attributes, values, father, max=None):
+   209                                                  
+   210       568          0.0      0.0      0.0      if len(attributes) == 0 or len(values) == 0 or len(training) == 0:
+   211                                                   return father
+   212                                           
+   213       567          0.0      0.0      0.0      if father is None:
+   214         1          0.0      0.0      0.0          n = check_tree(training)
+   215         1          0.0      0.0      0.0          if n is not None:
+   216                                                       return n
+   217         1          0.0      0.0      0.0          father = Node([],None,None,None,None)
+   218       568          0.0      0.0      0.0      if max is not None: max -= 1
+   219                                               
+   220       568          4.2      0.0     51.9      probability_dict_attribute,father_g = get_probabilities_and_father_g(training, attributes, values, father)
+   221       568          0.6      0.0      7.0      attribute_max_gain, entropies, gain = calculate_max_gain_and_entropies(probability_dict_attribute,father_g,training.shape[0])
+   222      2091          0.0      0.0      0.0      for idx,value in enumerate(values[attribute_max_gain]):
+   223      2091          0.0      0.0      0.1          new_node = Node([],value,entropies[idx],gain,attribute_max_gain)
+   224      2091          0.0      0.0      0.0          father.append_desc(new_node)
+   225      2091          0.7      0.0      9.1          mask = training[attribute_max_gain] == value
+   226      2091          0.8      0.0      9.9          training_filter = training[mask]
+   227      2091          1.8      0.0     21.7          node_leaf = check_tree(training_filter)
+   228      1524          0.0      0.0      0.0          if node_leaf is not None:
+   229      1524          0.0      0.0      0.0              new_node.append_desc(node_leaf)
+   230                                                   else:
+   231       567          0.0      0.0      0.0              new_attributes = attributes.copy()
+   232       567          0.0      0.0      0.0              new_attributes.remove(attribute_max_gain)
+   233       567          0.0      0.0      0.0              new_val = values.copy()
+   234       567          0.0      0.0      0.0              new_val.pop(attribute_max_gain)
+   235                                                   
+   236       567          0.0      0.0      0.0              if (max is None and new_attributes is not None ) or ( max > 0):
+   237       567          0.0      0.0      0.0                  id3(training_filter,new_attributes,new_val,new_node,max)
+   238                                                       else:
+   239                                                           finish_tree(training, new_node)
+   240                                           
+   241                                           
+   242       568          0.0      0.0      0.0      return father
+   243                                           
+   244                                               
+   245                                               ## nodo vacio
+   246                                               ##ganacia para los attributos set
+   247                                               ##> ganancia --> lo agregamos al arbol
+   248                                               ##volver a llamar a id3 pero sin ese atributo en el training_ set
+
+Total time: 8.2402 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: main at line 300
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   300                                           def main():
+   301         1          0.0      0.0      0.1      data = pd.read_csv('./resources/german_credit.csv')
+   302         1          0.0      0.0      0.0      attributes = list(data.head(0))
+   303         1          0.0      0.0      0.1      data = replaces_process_data(data, 'Duration of Credit (month)', 3)
+   304         1          0.0      0.0      0.0      data = replaces_process_data(data, 'Credit Amount', 3)
+   305         1          0.0      0.0      0.0      data = replaces_process_data(data, 'Age (years)', 3)
+   306                                           
+   307                                              
+   308                                           
+   309         1          0.0      0.0      0.0      df_list = metrics.cross_validation(data, 10)
+   310         1          0.0      0.0      0.0      test = df_list[0]
+   311         1          0.0      0.0      0.0      training = pd.DataFrame()
+   312         9          0.0      0.0      0.0      for j in range(1, 10):
+   313         9          0.0      0.0      0.1           training = pd.concat([training, df_list[j]], axis=0)
+   314                                           
+   315                                               
+   316         1          0.0      0.0      0.0      attributes.remove(creditability)
+   317         1          0.0      0.0      0.0      values_per_atr = {}
+   318        20          0.0      0.0      0.0      for atr in attributes :
+   319        20          0.0      0.0      0.1          values_per_atr[atr] = training[atr].unique()
+   320                                           
+   321                                           
+   322         1          8.2      8.2     99.5      father = id3(training,attributes,values_per_atr,None,None) #tree of the training
+   323                                               #resolve_test(test,father)
+   324                                              
+   325                                               #print(father)
+

@@ -1,0 +1,166 @@
+Timer unit: 1 s
+
+Total time: 1.02259 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: entropy at line 76
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    76                                           def entropy(probabilities):
+    77    367120          0.1      0.0     13.3      en = 0
+    78    734240          0.3      0.0     27.1      for p in probabilities:
+    79    620366          0.3      0.0     25.4          if p != 0:
+    80    113874          0.2      0.0     22.7              en -= p * math.log2(p)
+    81    367120          0.1      0.0     11.5      return en
+
+Total time: 3.50819 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: gain at line 83
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    83                                           def gain(relative_probs_value, values,g):
+    84     93665          0.1      0.0      1.5      entropies = []
+    85    367100          0.2      0.0      5.6      for value in values:
+    86    367100          2.7      0.0     76.7          e= entropy(relative_probs_value.get(value)[1:])
+    87    367100          0.3      0.0      9.1          g -= relative_probs_value.get(value)[0] *  e
+    88    367100          0.2      0.0      5.9          entropies.append(e)
+    89                                               
+    90     93665          0.0      0.0      1.2      return g, entropies
+
+Total time: 478.008 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: set_probabilities at line 99
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    99                                           def set_probabilities(training,attr_name,values):
+   100     93665          0.0      0.0      0.0      relative_probs_value = {}
+   101    367100          0.2      0.0      0.1      for value in values:
+   102    367100        104.9      0.0     22.0          mask = training[attr_name] == value
+   103    367100        110.8      0.0     23.2          training_filter = training[mask]
+   104    367100          0.2      0.0      0.1          relative_probs_value[value] = []
+   105    367100        123.6      0.0     25.9          mask = training_filter[creditability] == 0
+   106    367100        127.7      0.0     26.7          crediatability_filter = training_filter[mask]
+   107    367100          3.5      0.0      0.7          relative_probs_value[value].append(calculate_probability(training_filter.shape[0],training.shape[0]))
+   108    367100          2.9      0.0      0.6          relative_probs_value[value].append(calculate_probability(crediatability_filter.shape[0],training_filter.shape[0]))
+   109    367100          3.9      0.0      0.8          relative_probs_value[value].append(calculate_probability(training_filter.shape[0]-crediatability_filter.shape[0],training_filter.shape[0]))
+   110     93665          0.0      0.0      0.0      return relative_probs_value
+
+Total time: 486.223 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: get_max_gain at line 112
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   112                                           def get_max_gain(training, attributes, values, father):
+   113     12805          0.0      0.0      0.0      max_gain = 0
+   114     12805          0.0      0.0      0.0      attribute_max_gain = ""
+   115     12805          0.0      0.0      0.0      entropies = []
+   116                                               #gain_dict = {item: {} for item in attributes} #the value is set an another dict
+   117                                           
+   118                                               #for index, row in training.iterrows():
+   119                                           
+   120                                           
+   121                                           
+   122     93665          0.0      0.0      0.0      for attribute in attributes:
+   123     93665        486.0      0.0    100.0          g, e = calculate_gain_and_entropy(training,attribute,values[attribute],father)
+   124     91534          0.0      0.0      0.0          if max_gain <= g:
+   125     91534          0.0      0.0      0.0              max_gain = g
+   126     91534          0.0      0.0      0.0              attribute_max_gain = attribute
+   127     91534          0.0      0.0      0.0              entropies = e  
+   128                                               
+   129     12805          0.0      0.0      0.0      return attribute_max_gain, entropies, max_gain
+
+Total time: 485.618 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: calculate_gain_and_entropy at line 132
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   132                                           def calculate_gain_and_entropy(training,attribute,value,father):
+   133                                               
+   134     93645          0.1      0.0      0.0      if father is not None and father.value is not None:
+   135     93645          0.1      0.0      0.0          father_g = father.get_entropy()
+   136                                               else:
+   137        20          0.0      0.0      0.0          probabilities = []
+   138        20          0.0      0.0      0.0          crediatability_filter = training.loc[training[creditability] == 0]
+   139        20          0.0      0.0      0.0          probabilities.append(crediatability_filter.shape[0]/training.shape[0])
+   140        20          0.0      0.0      0.0          probabilities.append((training.shape[0]-crediatability_filter.shape[0])/training.shape[0])
+   141        20          0.0      0.0      0.0          father_g = entropy(probabilities)
+   142                                           
+   143     93665        481.0      0.0     99.0      relative_probs_value = set_probabilities(training,attribute, value)
+   144     93665          4.4      0.0      0.9      g, e = gain(relative_probs_value,value, father_g)
+   145                                           
+   146     93665          0.0      0.0      0.0      return g, e
+
+Total time: 514.063 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: id3 at line 172
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   172                                           def id3(training, attributes, values, father, max):
+   173                                                  
+   174     34207          0.1      0.0      0.0      if len(attributes) == 0 or len(values) == 0 or len(training) == 0:
+   175     34207          0.0      0.0      0.0          return father
+   176                                           
+   177     12804          0.0      0.0      0.0      if father is None:
+   178         1          0.0      0.0      0.0          n = check_tree(training)
+   179         1          0.0      0.0      0.0          if n is not None:
+   180                                                       return n
+   181         1          0.0      0.0      0.0          father = Node([],None,None,None,None)
+   182     12805          0.0      0.0      0.0      if max is not None: max -= 1
+   183     12805        486.5      0.0     94.6      attribute_max_gain, entropies, gain = get_max_gain(training, attributes, values, father)
+   184     47011          0.0      0.0      0.0      for idx,value in enumerate(values[attribute_max_gain]):
+   185     47011          0.2      0.0      0.0          new_node = Node([],value,entropies[idx],gain,attribute_max_gain)
+   186     47011         26.9      0.0      5.2          training_filter = training.loc[training[attribute_max_gain] == value]
+   187     47011          0.0      0.0      0.0          new_attributes = attributes.copy()
+   188     47011          0.0      0.0      0.0          new_attributes.remove(attribute_max_gain)
+   189     47011          0.1      0.0      0.0          new_val = values.copy()
+   190     47011          0.0      0.0      0.0          new_val.pop(attribute_max_gain)
+   191     47011          0.1      0.0      0.0          father.append_desc(new_node)
+   192     47011          0.0      0.0      0.0          if (max is None and new_attributes is not None ) or ( max > 0):
+   193     47011          0.0      0.0      0.0              id3(training_filter,new_attributes,new_val,new_node,max)
+   194                                                   else:
+   195                                                       finish_tree(training,new_node,father)
+   196                                                   
+   197                                           
+   198                                           
+   199     12805          0.0      0.0      0.0      return father
+   200                                           
+   201                                               
+   202                                               ## nodo vacio
+   203                                               ##ganacia para los attributos set
+   204                                               ##> ganancia --> lo agregamos al arbol
+   205                                               ##volver a llamar a id3 pero sin ese atributo en el training_ set
+
+Total time: 514.501 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP2\ejercicio1.py
+Function: main at line 226
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+   226                                           def main():
+   227         1          0.0      0.0      0.0      data = pd.read_csv('./resources/german_credit.csv')
+   228         1          0.0      0.0      0.0      attributes = list(data.head(0))
+   229         1          0.0      0.0      0.0      data = replaces_process_data(data, 'Duration of Credit (month)', 3)
+   230         1          0.0      0.0      0.0      data = replaces_process_data(data, 'Credit Amount', 3)
+   231         1          0.0      0.0      0.0      data = replaces_process_data(data, 'Age (years)', 3)
+   232                                           
+   233         1          0.0      0.0      0.0      attributes.remove(creditability)
+   234         1          0.0      0.0      0.0      values_per_atr = {}
+   235        20          0.0      0.0      0.0      for atr in attributes :
+   236        20          0.0      0.0      0.0          values_per_atr[atr] = data[atr].unique()
+   237                                           
+   238                                           
+   239         1          0.0      0.0      0.0      df_list = metrics.cross_validation(data, 10)
+   240         1          0.0      0.0      0.0      test = df_list[0]
+   241         1          0.0      0.0      0.0      training = pd.DataFrame()
+   242         9          0.0      0.0      0.0      for j in range(1, 10):
+   243         9          0.0      0.0      0.0           training = pd.concat([training, df_list[j]], axis=0)
+   244                                           
+   245                                           
+   246         1        514.5    514.5    100.0      father = id3(data,attributes,values_per_atr,None,None)
+   247         1          0.0      0.0      0.0      print("father")
+
