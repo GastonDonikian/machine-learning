@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from algorithms.kohonen_som import predict, kohonen_som
 import algorithms.hierarchical_clustering as hc
-import metrics
 import numpy as np
+import metrics 
 
 def date_to_int(d):
     return str(d)
@@ -58,41 +58,37 @@ def main():
     cut_length = len(data) // 100
     cut_array = data[:cut_length]
     hierarchical(cut_array)
+
+
+def ej1():
+    data = preprocess_csv()
+    partition = 5
+    seed = 2000
+
+    df_list = metrics.cross_validation(data, partition,seed)
+    #print(df_list)
+    test = df_list[0]
+
+    training = df_list[1]
+    for j in range(2, partition):
+        training = np.concatenate((training, df_list[j]), axis=0)
+    #training = training.to_numpy()
+    print("test")
+    print(len(test))
+    print("training")
+    print(len(training))
+    epochs = 50
+    trained_matrix, mean_distances_per_epoch = kohonen_som(training_set=training,
+                                 epochs=epochs,
+                                 eta=0.1,
+                                 vicinity_radius=5)
+    predict(example=data[0], trained_matrix=trained_matrix)
     
-    # trained_matrix = kohonen_som(training_set=data,
-    #                              epochs=20,
-    #                              learning_rate=0.1,
-    #                              vicinity_radius=5)
-    # predict(example=data[0], trained_matrix=trained_matrix)
+    epochs_list = np.array(range(epochs))
 
-# def main():
-#     data = preprocess_csv()
-#     partition = 5
-#     seed = 2000
+    plt.plot(epochs_list, mean_distances_per_epoch)
+    plt.show()
 
-#     df_list = metrics.cross_validation(data, partition,seed)
-#     #print(df_list)
-#     test = df_list[0]
-
-#     training = df_list[1]
-#     for j in range(2, partition):
-#         training = np.concatenate((training, df_list[j]), axis=0)
-#     #training = training.to_numpy()
-#     print("test")
-#     print(len(test))
-#     print("training")
-#     print(len(training))
-#     epochs = 50
-#     trained_matrix, mean_distances_per_epoch = kohonen_som(training_set=training,
-#                                  epochs=epochs,
-#                                  eta=0.1,
-#                                  vicinity_radius=5)
-#     predict(example=data[0], trained_matrix=trained_matrix)
-    
-#     epochs_list = np.array(range(epochs))
-
-#     plt.plot(epochs_list, mean_distances_per_epoch)
-#     plt.show()
 
 
 if __name__ == "__main__":
