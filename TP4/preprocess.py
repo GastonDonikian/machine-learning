@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 from algorithms.kohonen_som import predict, kohonen_som
 import algorithms.hierarchical_clustering as hc
+from algorithms.k_medias import k_means
 import numpy as np
 import metrics 
 
@@ -60,7 +61,7 @@ def main():
     hierarchical(cut_array)
 
 
-def ej1():
+def ej1_kohonen():
     data = preprocess_csv()
     partition = 5
     seed = 2000
@@ -100,7 +101,31 @@ def ej1():
     plt.imshow(popularity_matrix, cmap='hot', interpolation='nearest')
     plt.show()
 
+def ej1_k_medias():
+    data = preprocess_csv()
+    partition = 5
+    seed = 2000
+
+    df_list = metrics.cross_validation(data, partition,seed)
+    #print(df_list)
+    test = df_list[0]
+
+    training = df_list[1]
+    for j in range(2, partition):
+        training = np.concatenate((training, df_list[j]), axis=0)
+    #training = training.to_numpy()
+    print("test")
+    print(len(test))
+    print("training")
+    print(len(training))
+    k = 7
+    centroids, clusters = k_means(training, k, iterations=2000, threshold=0.001)
+    # print("Centroids")
+    # print(centroids)
+    # print("Clusters")
+    # print(clusters)
+
 
 if __name__ == "__main__":
     #main()
-    ej1()
+    ej1_k_medias()
