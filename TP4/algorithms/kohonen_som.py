@@ -6,11 +6,12 @@ import numpy as np
 from numpy import floor
 
 
+
 def _calculate_distance(point_1, point_2):
-    return np.sqrt(np.sum((point_1 - point_2) ** 2))
+    return np.linalg.norm(np.subtract(point_1, point_2), 2)
 
 
-def _find_bmu(example, weights):
+def _find_bmu(example, weights,popularity_matrix):
     min_distance = np.inf
     bmu_index = None
 
@@ -22,16 +23,23 @@ def _find_bmu(example, weights):
                 min_distance = distance
                 bmu_index = (i, j)
     w_row, w_col = bmu_index
+    popularity_matrix[w_row][w_col] += 1
     return w_row, w_col,min_distance
 
+random_weights = False
 
-def _initialize_weight_matrix(dimension=2, rows=5, cols=5):
-    return np.random.random((cols, rows, dimension))
-    # return [[[random.random() for _ in range(dimension)] for _ in range(rows)] for _ in range(cols)]
+def _initialize_weight_matrix(training_set,dimension=2, rows=7, cols=7):
+    #weights = [[None for l in range(rows)] for k in range(cols)]
+    weights = np.zeros((rows,cols,dimension))
+    for row in range(rows):
+        for col in range(cols):
+            idx = np.random.randint(0, len(training_set))
+            weights[row][col] = training_set[idx].copy()
+    return weights
+    
 
 
 def _calculate_winning_neuron_update(example, weight, learning_rate):
-    # TODO
     return weight + learning_rate * (example - weight)
 
 
@@ -40,24 +48,31 @@ def _calculate_losing_neuron_update(example, weight, learning_rate, radius):
         return weight
     distance = _calculate_distance(example, weight)
     v_factor = math.exp((-2 * distance) / radius)
-    return learning_rate * v_factor * distance * (example - weight)
+    return weight + learning_rate * v_factor * (example - weight)
 
 
-def kohonen_som(training_set, epochs=2000, eta=0.5, vicinity_radius=3):
+def kohonen_som(training_set, epochs=2000, eta=0.5, vicinity_radius=3, rows=7, cols=7):
     if training_set is None or len(training_set) == 0:
         raise ValueError("Training set can't be empty!")
     dimension = len(training_set[0])
-    weight_matrix = _initialize_weight_matrix(dimension=dimension)
+    weight_matrix = _initialize_weight_matrix(training_set,dimension=dimension,rows=rows,cols=cols)
     rows, cols, n_array = weight_matrix.shape
+    print("rows")
+    print(rows)
+    print("cols")
+    print(cols)
+    vicinity_radius = rows
     mean_distances_per_epoch = []
     learning_rate = eta
+    radius=vicinity_radius
+    popularity_matrix = np.zeros((rows,cols))
     for epoch in range(epochs):
         print(str((epoch/epochs)*100) + "%", end="\r")
         # EXAMPLE SHOULD BE A NP ARRAY!!!
         min_distaces = []
         for example in training_set:
             # Saco al ganador
-            w_row, w_col, min_distance = _find_bmu(example=example, weights=weight_matrix)
+            w_row, w_col, min_distance = _find_bmu(example=example, weights=weight_matrix, popularity_matrix=popularity_matrix)
             min_distaces.append(min_distance)
             # Actualizo neurona ganadora
             weight_matrix[w_row][w_col] = _calculate_winning_neuron_update(
@@ -65,23 +80,24 @@ def kohonen_som(training_set, epochs=2000, eta=0.5, vicinity_radius=3):
                 weight=weight_matrix[w_row][w_col],
                 learning_rate=learning_rate)
             # Actualizo neuronas perdedoras
-            for i in range(max(0, w_row - floor(vicinity_radius)), min(rows, w_row + floor(vicinity_radius) + 1)):
-                for j in range(max(0, w_col - floor(vicinity_radius)), min(cols, w_col + floor(vicinity_radius) + 1)):
-                    if i == w_row and j == w_col:
-                        pass
-                    weight_matrix[i][j] = _calculate_losing_neuron_update(
+            for row in range(rows):
+                for col in range(cols):
+                    if (row!= w_row or col!=w_col) and _calculate_distance([row, col], [w_row, w_col]) <= radius:
+                        weight_matrix[row][col] = _calculate_losing_neuron_update(
                         example=example,
-                        weight=weight_matrix[i][j],
+                        weight=weight_matrix[row][col],
                         learning_rate=learning_rate,
-                        radius=_calculate_distance(np.array((i, j)), np.array((w_col, w_row))))
+                        radius=radius)
+            
         learning_rate = eta * (1 - epoch / epochs)
         mean_distances_per_epoch.append(sum(min_distaces)/len(min_distaces))
-        # vicinity_radius = (epochs - epoch) * vicinity_radius / epochs
-    return weight_matrix,mean_distances_per_epoch
+        radius=(epochs-epoch)*vicinity_radius/epochs
+        
+    return weight_matrix,mean_distances_per_epoch,popularity_matrix
 
 
-def predict(example, trained_matrix):
-    return _find_bmu(example=example, weights=trained_matrix)
+def predict(example, trained_matrix, popularity_matrix):
+    return _find_bmu(example=example, weights=trained_matrix, popularity_matrix=popularity_matrix)
 
 
 def main():

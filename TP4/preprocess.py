@@ -78,18 +78,29 @@ def ej1():
     print("training")
     print(len(training))
     epochs = 50
-    trained_matrix, mean_distances_per_epoch = kohonen_som(training_set=training,
+    k=7
+    rows = k
+    cols=k
+    trained_matrix, mean_distances_per_epoch, popularity_matrix = kohonen_som(training_set=training,
                                  epochs=epochs,
                                  eta=0.1,
-                                 vicinity_radius=5)
-    predict(example=data[0], trained_matrix=trained_matrix)
+                                 vicinity_radius=5, rows=rows, cols=cols)
+    predict(example=data[0], trained_matrix=trained_matrix, popularity_matrix=popularity_matrix)
     
     epochs_list = np.array(range(epochs))
-
+    print("Popularity matrix")
+    print(popularity_matrix)
+    plt.title("Distancia promedio por epoca")
+    plt.xlabel('Epocas')
+    plt.ylabel('Distancia Media')
     plt.plot(epochs_list, mean_distances_per_epoch)
+    plt.show()
+    
+    plt.title("Popularity Matrix Heat Map")
+    plt.imshow(popularity_matrix, cmap='hot', interpolation='nearest')
     plt.show()
 
 
-
 if __name__ == "__main__":
-    main()
+    #main()
+    ej1()
