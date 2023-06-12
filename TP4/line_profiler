@@ -1,51 +1,76 @@
 Timer unit: 1 s
 
-Total time: 0.481487 s
+Total time: 0.105851 s
 File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP4\algorithms\hierarchical_clustering.py
-Function: hierarchical_clustering at line 44
+Function: calculate_distance at line 11
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
-    44                                           def hierarchical_clustering(points,calculate_distance='min'):
-    45         1          0.0      0.0      0.0      threshold = 0.0001
-    46         1          0.0      0.0      0.4      distance_matrix = _get_distance_matrix(points=points)
-    47         1          0.0      0.0      0.0      final_clusters = []
-    48                                               # Cada cluster es un array con un unico elemento, ahora tengo que mergear
-    49         1          0.0      0.0      0.0      clusters = [[(points[i],i)] for i in range(len(points))]
-    50         1          0.0      0.0      0.0      clusters = np.array(clusters, dtype=object)
-    51        48          0.0      0.0      0.0      while len(clusters) > 1:
-    52        48          0.0      0.0      0.0          min_distance = np.inf
-    53        48          0.0      0.0      0.0          distance = min_distance
-    54        48          0.0      0.0      0.0          merge_indices = None
-    55        48          0.0      0.0      0.0          i=0
-    56      1224          0.0      0.0      0.1          for i in range(len(clusters)):
-    57     19600          0.0      0.0      1.5              for j in range(i + 1,len(clusters)):
-    58     19600          0.5      0.0     93.9                  distance = calculate_distance_clusters.get(calculate_distance)(distance_matrix,clusters[i],clusters[j])
-    59     19265          0.0      0.0      1.8                  if distance < min_distance:
-    60       335          0.0      0.0      0.0                      min_distance = distance
-    61                                                               # me guardo la tupla de indices
-    62       335          0.0      0.0      0.0                      merge_indices = (i, j)
-    63     19600          0.0      0.0      2.0                  if min_distance < threshold:
-    64                                                               break
-    65                                                   # Merge the closest clusters
-    66        48          0.0      0.0      0.1          merged_cluster = np.concatenate((clusters[merge_indices[0]], clusters[merge_indices[1]]))
-    67        48          0.0      0.0      0.1          clusters = [c for idx, c in enumerate(clusters) if idx not in merge_indices]
-    68        48          0.0      0.0      0.0          clusters.append(merged_cluster)
-    69        48          0.0      0.0      0.0          final_clusters.append(merged_cluster)
-    70                                                  
-    71                                                  
-    72                                              
-    73         1          0.0      0.0      0.0      return final_clusters
+    11                                               def calculate_distance(self,centroids):
+    12      1244          0.1      0.0    100.0              return  np.linalg.norm(self.centroid - centroids, axis=1)
 
-Total time: 1.27751 s
+Total time: 0 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP4\algorithms\hierarchical_clustering.py
+Function: _calculate_distance_clusters_min_distance at line 42
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    42                                           def _calculate_distance_clusters_min_distance(distance_matrix, cluster1, cluster2):
+    43                                               indices1 = [p1[1] for p1 in cluster1]
+    44                                               indices2 = [p2[1] for p2 in cluster2]
+    45                                               distance = np.min(np.take(distance_matrix, indices1, axis=0, mode='raise').take(indices2, axis=1, mode='raise'))
+    46                                               return distance
+
+Total time: 5.43996 s
+File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP4\algorithms\hierarchical_clustering.py
+Function: hierarchical_clustering at line 49
+
+Line #      Hits         Time  Per Hit   % Time  Line Contents
+==============================================================
+    49                                           def hierarchical_clustering(points):
+    50         1          0.0      0.0      0.0      threshold = 0.0001
+    51         1          0.1      0.1      1.4      distance_matrix = _get_distance_matrix(points=points)
+    52         1          0.0      0.0      0.0      final_clusters = []
+    53         1          0.0      0.0      0.0      clusters = []
+    54         1          0.0      0.0      0.0      centroids = []
+    55                                               # Cada cluster es un array con un unico elemento, ahora tengo que mergear
+    56      1245          0.0      0.0      0.0      for i in range(len(points)):
+    57      1245          0.1      0.0      1.1         clusters.append(Cluster([points[i]],[i]))
+    58         1          0.0      0.0      0.0      clusters = np.array(clusters, dtype=object)    
+    59         1          0.0      0.0      0.0      centroids =  np.array([cluster.centroid for cluster in clusters])
+    60                                           
+    61      1244          0.0      0.0      0.0      while len(clusters) > 1:
+    62      1244          0.2      0.0      3.2          print(len(clusters),'          ', end='\r')
+    63      1244          0.5      0.0      9.8          merge_indices = np.unravel_index(distance_matrix.argmin(), distance_matrix.shape)
+    64      1244          0.1      0.0      2.3          merged_cluster = Cluster(
+    65      1244          0.0      0.0      0.1              clusters[merge_indices[0]].points + clusters[merge_indices[1]].points,
+    66      1244          0.0      0.0      0.0              clusters[merge_indices[0]].indices + clusters[merge_indices[1]].indices
+    67                                                   )
+    68                                                   #clusters = [c for idx, c in enumerate(clusters) if idx not in merge_indices]
+    69      1244          0.1      0.0      1.2          clusters = np.delete(clusters,merge_indices[1])
+    70      1244          1.7      0.0     31.9          distance_matrix = np.delete(distance_matrix,merge_indices[1],0)
+    71      1244          2.4      0.0     44.9          distance_matrix = np.delete(distance_matrix,merge_indices[1],1)
+    72      1244          0.1      0.0      1.6          centroids = np.delete(centroids,merge_indices[1],0)
+    73                                           
+    74      1244          0.0      0.0      0.1          centroids[merge_indices[0]] = merged_cluster.centroid
+    75      1244          0.0      0.0      0.0          clusters[merge_indices[0]] = merged_cluster
+    76      1244          0.1      0.0      2.0          distances = merged_cluster.calculate_distance(centroids)
+    77      1244          0.0      0.0      0.0          final_clusters.append(merged_cluster)
+    78      1244          0.0      0.0      0.1          distance_matrix[merge_indices[0]] = distances
+    79      1244          0.0      0.0      0.2          distance_matrix[:, merge_indices[0]] = distances
+    80      1244          0.0      0.0      0.0          distance_matrix[merge_indices[0], merge_indices[0]] = np.inf
+    81                                               #print(final_clusters)  
+    82         1          0.0      0.0      0.0      return final_clusters
+
+Total time: 5.55034 s
 File: c:\Users\Natu\Desktop\natu\Itba\MachineLearning\TPS\machine-learning\TP4\preprocess.py
 Function: main at line 56
 
 Line #      Hits         Time  Per Hit   % Time  Line Contents
 ==============================================================
     56                                           def main():
-    57         1          0.1      0.1      6.6      data = preprocess_csv()
-    58         1          0.0      0.0      0.0      cut_length = len(data) // 100
+    57         1          0.1      0.1      1.5      data = preprocess_csv()
+    58         1          0.0      0.0      0.0      cut_length = len(data)//4
     59         1          0.0      0.0      0.0      cut_array = data[:cut_length]
-    60         1          1.2      1.2     93.4      hierarchical(cut_array)
+    60         1          5.5      5.5     98.5      hierarchical(cut_array)
 

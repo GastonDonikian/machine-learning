@@ -51,11 +51,11 @@ def ejercicio_a():
 def hierarchical(data):
    print("hierarchical")
    clusters = hc.hierarchical_clustering(data)
-   print(clusters)
+   
 
 def main():
     data = preprocess_csv()
-    cut_length = len(data) // 100
+    cut_length = len(data)//2
     cut_array = data[:cut_length]
     hierarchical(cut_array)
 
