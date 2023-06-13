@@ -9,6 +9,7 @@ import metrics
 import pickle
 
 
+
 def date_to_int(d):
     return str(d)
 
@@ -55,16 +56,20 @@ def ejercicio_a():
     plt.show()
 
 
-def hierarchical(data):
-    print("hierarchical")
-    clusters = hc.hierarchical_clustering(data)
+def hierarchical_graph(clusters):
+    #print("HOLA")
+    print(clusters)
 
-
-def main():
+def ej1_hierarchical():
     data = preprocess_csv()
-    cut_length = len(data) // 2
+    cut_length = len(data)//400
+
     cut_array = data[:cut_length]
-    hierarchical(cut_array)
+    print(len(cut_array))
+    print("in")
+    clusters = hc.hierarchical_clustering(cut_array)
+    print("out")
+    hierarchical_graph(clusters)
 
 
 def save_var(var):
@@ -161,3 +166,5 @@ if __name__ == "__main__":
     # main()
     # ej1_kohonen()
     ej1_k_medias()
+    ej1_hierarchical()
+    #ej1_k_medias()
