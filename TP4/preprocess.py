@@ -56,65 +56,6 @@ def ejercicio_a():
     # Display the boxplots
     plt.show()
 
-<<<<<<< HEAD
-def filter_points(cluster,k=10, map_clusters={}, lenght=10):
-    if k == 0:
-        map_clusters[lenght] = cluster.points
-        return map_clusters
-    else:
-       clusters_childs = cluster.descendants
-       if (len(clusters_childs)) > 1:
-            filter_points(clusters_childs[0],k-1,map_clusters,lenght)
-            filter_points(clusters_childs[1],k-2,map_clusters,lenght)
-       r = k - lenght
-       points_filter = []
-       for i in range(0,r):
-           points_filter.extend(map_clusters[i])
-       points = copy.copy(cluster.points)
-       map_clusters[r] =  [element for element in points if element not in points_filter]
-       return map_clusters
-
-
-def hierarchical_graph(clusters):
-    map_cluster = filter_points(clusters[0])
-    filtered_map = {}
-    for key, value in map_cluster.items():
-        filtered_vectors = [vector[3] for vector in value]
-        filtered_map[key] = filtered_vectors
-
-    for key in filtered_map:
-        x_values = filtered_map[key]
-        y_value = key
-        color = 'C' + str(key)
-        plt.scatter(x_values, [y_value]*len(x_values), cmap='viridis')
-
-    plt.xlabel("X")
-    plt.ylabel("Y")
-    plt.grid()
-    plt.show()
-   
-
-def ej1_hierarchical():
-    data = preprocess_csv()
-    cut_length = len(data)//50
-=======
-
-def hierarchical_graph(clusters):
-    #print("HOLA")
-    print(clusters)
-
-def ej1_hierarchical():
-    data = preprocess_csv()
-    cut_length = len(data)//400
-
->>>>>>> 583d1d8def8bae9189a80fcea6a1b64b576d558b
-    cut_array = data[:cut_length]
-    print(len(cut_array))
-    print("in")
-    clusters = hc.hierarchical_clustering(cut_array)
-    print("out")
-    hierarchical_graph(clusters)
-
 
 def save_var(var):
     file = open('Python.txt', 'w')
@@ -207,14 +148,7 @@ def ej1_k_medias():
 
 
 if __name__ == "__main__":
-<<<<<<< HEAD
     #main()
     #ej1_kohonen()
-    #ej1_k_medias()
-=======
-    # main()
-    # ej1_kohonen()
     ej1_k_medias()
->>>>>>> 583d1d8def8bae9189a80fcea6a1b64b576d558b
-    ej1_hierarchical()
     #ej1_k_medias()
