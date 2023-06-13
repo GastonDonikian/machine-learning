@@ -6,6 +6,8 @@ import algorithms.hierarchical_clustering as hc
 from algorithms.k_medias import k_means
 import numpy as np
 import metrics 
+import pickle
+
 
 
 def date_to_int(d):
@@ -67,6 +69,14 @@ def ej1_hierarchical():
     print("out")
     hierarchical_graph(clusters)
 
+def save_var(var):
+    file = open('Python.txt', 'w')
+    pickle.dump(var, file)
+    file.close()
+
+def retrieve_var():
+    with open('Python.txt', 'rb') as f:
+        return pickle.load(f)
 
 def ej1_kohonen():
     data = preprocess_csv()
@@ -85,27 +95,39 @@ def ej1_kohonen():
     print(len(test))
     print("training")
     print(len(training))
-    epochs = 50
-    k=7
-    rows = k
-    cols=k
-    trained_matrix, mean_distances_per_epoch, popularity_matrix = kohonen_som(training_set=training,
-                                 epochs=epochs,
-                                 eta=0.1,
-                                 vicinity_radius=5, rows=rows, cols=cols)
-    predict(example=data[0], trained_matrix=trained_matrix, popularity_matrix=popularity_matrix)
     
+    mean_distances_by_k = []
+    epochs = 100
     epochs_list = np.array(range(epochs))
-    print("Popularity matrix")
-    print(popularity_matrix)
+    for ki in [7]:
+        #k=7
+        k=ki
+        rows = k
+        cols=k
+        trained_matrix, mean_distances_per_epoch, popularity_matrix = kohonen_som(training_set=training,
+                                    epochs=epochs,
+                                    eta=0.1,
+                                    vicinity_radius=5, rows=rows, cols=cols)
+        mean_distances_by_k.append(mean_distances_per_epoch)
+        #plt.plot(epochs_list, mean_distances_per_epoch, label="k=" +str(k))
+
+    #predict(example=data[0], trained_matrix=trained_matrix, popularity_matrix=popularity_matrix)
+    #save_var(mean_distances_by_k)
+    
+    # print("Popularity matrix")
+    # print(popularity_matrix)
     plt.title("Distancia promedio por epoca")
     plt.xlabel('Epocas')
     plt.ylabel('Distancia Media')
-    plt.plot(epochs_list, mean_distances_per_epoch)
+    for line in mean_distances_by_k:
+        plt.plot(epochs_list, line)
+    #plt.gca().legend(('k=3','k=5','k=7','k=9'))
     plt.show()
     
     plt.title("Popularity Matrix Heat Map")
-    plt.imshow(popularity_matrix, cmap='hot', interpolation='nearest')
+    #plt.imshow(popularity_matrix, cmap='hot', interpolation='nearest')
+    heatmap = plt.pcolor(popularity_matrix)
+    plt.colorbar()
     plt.show()
 
 def ej1_k_medias():
@@ -134,5 +156,8 @@ def ej1_k_medias():
 
 
 if __name__ == "__main__":
+    #main()
+    #ej1_kohonen()
+    ej1_k_medias()
     ej1_hierarchical()
     #ej1_k_medias()
