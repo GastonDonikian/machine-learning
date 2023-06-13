@@ -45,20 +45,22 @@ def k_means(data, k, iterations=1000, threshold=0.001):
         #     print(len(clu))
         # Actualizo centroides     
         for idx in range(0,k):
-            if len(clusters[idx]) != 0:
-                new_centroids[idx] = update_centroid(idx, centroids, clusters)
-            else:
-                new_centroids[idx] = []
+            new_centroids[idx] = update_centroid(idx, centroids, clusters)
+    
 
         #Repito para todos los puntos
         for point in data:
             # Calculo la distancia entre cada punto para todos los centroide
-            distances = [_calculate_distance(point, centroid) for centroid in centroids]
+            distances = [_calculate_distance(point, centroid) for centroid in new_centroids]
             # np.argmin me devuelve el indice, o sea, el indice del cluster mas cercano
             cluster_index = np.argmin(distances)
             # le agrego ese punto al cluster
             clusters[cluster_index].append(point)
 
+        print("Centroids")
+        print(centroids)
+        print("New Centroids")
+        print(new_centroids)
         
 
         # me fijo que el threshold no sea menor.
