@@ -37,17 +37,16 @@ def k_means(data, k, iterations=1000, threshold=0.001):
     #print(clusters)
     new_centroids = np.empty((k,len(data[0])))
     #print(new_centroids)
-    it = 0
-    for _ in range(iterations):
-        print(it)
+    for i in range(iterations):
+        print(i)
         # print("Clusters:")
         # for clu in clusters:
         #     print(len(clu))
         # Actualizo centroides     
         for idx in range(0,k):
             new_centroids[idx] = update_centroid(idx, centroids, clusters)
-    
 
+        clusters = [[] for _ in range(k)]
         #Repito para todos los puntos
         for point in data:
             # Calculo la distancia entre cada punto para todos los centroide
@@ -71,8 +70,7 @@ def k_means(data, k, iterations=1000, threshold=0.001):
         if max_distance < threshold:
             break
 
-        centroids = new_centroids
-        it += 1
+        centroids = new_centroids.copy()
 
     return centroids, clusters
 
