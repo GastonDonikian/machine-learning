@@ -64,7 +64,7 @@ def kohonen_som(training_set, epochs=2000, eta=0.5, vicinity_radius=3, rows=7, c
     vicinity_radius = rows
     mean_distances_per_epoch = []
     learning_rate = eta
-    radius=vicinity_radius
+    radius = vicinity_radius
     popularity_matrix = np.zeros((rows,cols))
     for epoch in range(epochs):
         print(str((epoch/epochs)*100) + "%", end="\r")
@@ -91,9 +91,9 @@ def kohonen_som(training_set, epochs=2000, eta=0.5, vicinity_radius=3, rows=7, c
             
         learning_rate = eta * (1 - epoch / epochs)
         mean_distances_per_epoch.append(sum(min_distaces)/len(min_distaces))
-        radius=(epochs-epoch)*vicinity_radius/epochs
+        radius = (epochs-epoch)*vicinity_radius/epochs
         
-    return weight_matrix,mean_distances_per_epoch,popularity_matrix
+    return weight_matrix, mean_distances_per_epoch,popularity_matrix
 
 
 def predict(example, trained_matrix, popularity_matrix):

@@ -5,8 +5,9 @@ from algorithms.kohonen_som import predict, kohonen_som
 import algorithms.hierarchical_clustering as hc
 from algorithms.k_medias import k_means
 import numpy as np
-import metrics 
+import metrics
 import pickle
+
 
 def date_to_int(d):
     return str(d)
@@ -16,15 +17,18 @@ def preprocess_csv():
     data_frame = pd.read_csv('./resources/movie_data.csv', delimiter=';')
     column_titles = data_frame.columns.tolist()
     data_frame = data_frame.iloc[1:]
-
+    genre_preprocess = {'Adventure': 1, 'Comedy': 2, 'Action': 3, 'Drama': 4, 'Crime': 5, 'Fantasy': 6,
+                        'Science Fiction': 7,
+                        'Horror': 8, 'Romance': 9, 'Mystery': 10, 'Thriller': 11, 'Documentary': 12, 'Animation': 13,
+                        'Family': 14, 'History': 15, 'War': 16, 'Western': 17, 'Music': 18, 'TV Movie': 19,
+                        'Foreign': 20}
+    for k in genre_preprocess:
+        data_frame['genres'] = data_frame['genres'].replace([k], [int(genre_preprocess[k])])
     data_frame = data_frame.dropna()
     data_frame.drop('imdb_id', axis=1, inplace=True)
     data_frame.drop('original_title', axis=1, inplace=True)
     data_frame.drop('overview', axis=1, inplace=True)
     data_frame.drop('release_date', axis=1, inplace=True)
-
-    genres = data_frame.pop("genres")
-    normalized_df = (data_frame - data_frame.mean()) / data_frame.std()
 
     for column in data_frame:
         col = data_frame[column]
@@ -50,62 +54,67 @@ def ejercicio_a():
     # Display the boxplots
     plt.show()
 
+
 def hierarchical(data):
-   print("hierarchical")
-   clusters = hc.hierarchical_clustering(data)
-   
+    print("hierarchical")
+    clusters = hc.hierarchical_clustering(data)
+
 
 def main():
     data = preprocess_csv()
-    cut_length = len(data)//2
+    cut_length = len(data) // 2
     cut_array = data[:cut_length]
     hierarchical(cut_array)
+
 
 def save_var(var):
     file = open('Python.txt', 'w')
     pickle.dump(var, file)
     file.close()
 
+
 def retrieve_var():
     with open('Python.txt', 'rb') as f:
         return pickle.load(f)
+
 
 def ej1_kohonen():
     data = preprocess_csv()
     partition = 5
     seed = 2000
 
-    df_list = metrics.cross_validation(data, partition,seed)
-    #print(df_list)
+    df_list = metrics.cross_validation(data, partition, seed)
+    # print(df_list)
     test = df_list[0]
 
     training = df_list[1]
     for j in range(2, partition):
         training = np.concatenate((training, df_list[j]), axis=0)
-    #training = training.to_numpy()
+    # training = training.to_numpy()
     print("test")
     print(len(test))
     print("training")
     print(len(training))
-    
+
     mean_distances_by_k = []
     epochs = 100
     epochs_list = np.array(range(epochs))
     for ki in [7]:
-        #k=7
-        k=ki
+        # k=7
+        k = ki
         rows = k
-        cols=k
+        cols = k
         trained_matrix, mean_distances_per_epoch, popularity_matrix = kohonen_som(training_set=training,
-                                    epochs=epochs,
-                                    eta=0.1,
-                                    vicinity_radius=5, rows=rows, cols=cols)
+                                                                                  epochs=epochs,
+                                                                                  eta=0.1,
+                                                                                  vicinity_radius=5, rows=rows,
+                                                                                  cols=cols)
         mean_distances_by_k.append(mean_distances_per_epoch)
-        #plt.plot(epochs_list, mean_distances_per_epoch, label="k=" +str(k))
+        # plt.plot(epochs_list, mean_distances_per_epoch, label="k=" +str(k))
 
-    #predict(example=data[0], trained_matrix=trained_matrix, popularity_matrix=popularity_matrix)
-    #save_var(mean_distances_by_k)
-    
+    # predict(example=data[0], trained_matrix=trained_matrix, popularity_matrix=popularity_matrix)
+    # save_var(mean_distances_by_k)
+
     # print("Popularity matrix")
     # print(popularity_matrix)
     plt.title("Distancia promedio por epoca")
@@ -113,28 +122,29 @@ def ej1_kohonen():
     plt.ylabel('Distancia Media')
     for line in mean_distances_by_k:
         plt.plot(epochs_list, line)
-    #plt.gca().legend(('k=3','k=5','k=7','k=9'))
+    # plt.gca().legend(('k=3','k=5','k=7','k=9'))
     plt.show()
-    
+
     plt.title("Popularity Matrix Heat Map")
-    #plt.imshow(popularity_matrix, cmap='hot', interpolation='nearest')
+    # plt.imshow(popularity_matrix, cmap='hot', interpolation='nearest')
     heatmap = plt.pcolor(popularity_matrix)
     plt.colorbar()
     plt.show()
+
 
 def ej1_k_medias():
     data = preprocess_csv()
     partition = 5
     seed = 2000
 
-    df_list = metrics.cross_validation(data, partition,seed)
-    #print(df_list)
+    df_list = metrics.cross_validation(data, partition, seed)
+    # print(df_list)
     test = df_list[0]
 
     training = df_list[1]
     for j in range(2, partition):
         training = np.concatenate((training, df_list[j]), axis=0)
-    #training = training.to_numpy()
+    # training = training.to_numpy()
     print("test")
     print(len(test))
     print("training")
@@ -148,6 +158,6 @@ def ej1_k_medias():
 
 
 if __name__ == "__main__":
-    #main()
-    #ej1_kohonen()
+    # main()
+    # ej1_kohonen()
     ej1_k_medias()
