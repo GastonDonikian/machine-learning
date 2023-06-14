@@ -3,14 +3,14 @@ import numpy as np
 
 
 class Cluster:
-    def __init__(self,points,indices,descendats=None):
+    def __init__(self,points,indices,descendants=None):
         self.points = points
         self.indices = indices
         self.centroid =  np.mean(points, axis=0)
-        if descendats == None:
+        if descendants == None:
             self.descendants = []
         else:
-            self.descendants = descendats
+            self.descendants = descendants
 
     def calculate_distance(self,centroids):
             return  np.linalg.norm(self.centroid - centroids, axis=1)
@@ -49,9 +49,9 @@ def hierarchical_clustering(points):
         merge_indices = np.unravel_index(distance_matrix.argmin(), distance_matrix.shape)
         descendants = []
         descendants.append(clusters[merge_indices[0]])
-        descendants.extend(clusters[merge_indices[0]].descendants)
+        #descendants.extend(clusters[merge_indices[0]].descendants)
         descendants.append(clusters[merge_indices[1]])
-        descendants.extend(clusters[merge_indices[1]].descendants)
+        #descendants.extend(clusters[merge_indices[1]].descendants)
         merged_cluster = Cluster(
             clusters[merge_indices[0]].points + clusters[merge_indices[1]].points,
             clusters[merge_indices[0]].indices + clusters[merge_indices[1]].indices,
