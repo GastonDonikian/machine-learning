@@ -8,6 +8,7 @@ import numpy as np
 import metrics
 import pickle
 import copy
+import preprocess 
 
 genre_preprocess = {'Adventure': 1, 'Comedy': 2, 'Action': 3, 'Drama': 4, 'Crime': 5, 'Fantasy': 6,
                         'Science Fiction': 7,
@@ -19,63 +20,41 @@ def date_to_int(d):
     return str(d)
 
 
-def preprocess_csv():
-    data_frame = pd.read_csv('./resources/movie_data.csv', delimiter=';')
-    column_titles = data_frame.columns.tolist()
-    data_frame = data_frame.iloc[1:]
-
-    for k in genre_preprocess:
-        data_frame['genres'] = data_frame['genres'].replace([k], [int(genre_preprocess[k])])
-    data_frame = data_frame.dropna()
-    data_frame.drop('imdb_id', axis=1, inplace=True)
-    data_frame.drop('original_title', axis=1, inplace=True)
-    data_frame.drop('overview', axis=1, inplace=True)
-    data_frame.drop('release_date', axis=1, inplace=True)
-
-    for column in data_frame:
-        col = data_frame[column]
-        data_frame[column] = (col - col.mean()) / col.std()
-
-    data = data_frame.to_numpy()
-    print(data[0])
-    return data
 
 
-def filter_points(cluster,k=10, map_clusters={}, lenght=10):
+def filter_points(cluster,k=10, clusters = [], lenght=10):
     if k == 0:
-        map_clusters[lenght] = cluster.points
-        return map_clusters
+        clusters.append(cluster.points)
+        return clusters
     else:
        clusters_childs = cluster.descendants
        if (len(clusters_childs)) > 1:
-            filter_points(clusters_childs[0],k-1,map_clusters,lenght)
-            filter_points(clusters_childs[1],k-2,map_clusters,lenght)
-       r = k - lenght
-       points_filter = []
-       for i in range(0,r):
-           points_filter.extend(map_clusters[i])
-       points = copy.copy(cluster.points)
-       map_clusters[r] =  [element for element in points if element not in points_filter]
-       return map_clusters
+            filter_points(clusters_childs[0],k-1,clusters,lenght)
+            filter_points(clusters_childs[1],k-1,clusters,lenght)
+        
+    return clusters
+
 
 def hierarchical_graph(clusters):
-    map_cluster = filter_points(clusters[0])
+    clusters = filter_points(clusters[0])
     filtered_map = {}
- 
-    genre_counts = np.zeros((len(map_cluster), len(genre_preprocess)), dtype=int)
-
+    norm_values_to_categories = {-1.27: 0, -0.08: 1, 1.11: 2}
+    genre_counts = np.zeros((len(clusters), len(norm_values_to_categories)), dtype=int)
+    
     # Populate genre_counts array
-    for key, points in map_cluster.items():
+  
+    for i,points in enumerate(clusters):
         for point in points:
-            print(point)
-            genre_counts[key][point[1]] += 1
+            p = point[1]
+            genre_counts[i][norm_values_to_categories[round(p,2)]] += 1
 
+    print(genre_counts)
     # Create the heatmap
-    plt.imshow(genre_counts, cmap='hot')
+    plt.imshow(genre_counts, cmap='winter')
 
     # Add genre labels
-    genre_labels = [genre_preprocess[i] for i in sorted(genre_preprocess)]
-    plt.xticks(np.arange(len(genre_preprocess)), genre_labels, rotation=90)
+    genre_labels = [norm_values_to_categories[i] for i in sorted(norm_values_to_categories)]
+    plt.xticks(np.arange(len(norm_values_to_categories)), genre_labels, rotation=90)
     plt.yticks(np.arange(len(filtered_map)), filtered_map.keys())
 
     plt.xlabel("Genres")
@@ -85,7 +64,7 @@ def hierarchical_graph(clusters):
     plt.show()
 
 def ej1_hierarchical():
-    data = preprocess_csv()
+    data = preprocess.preprocess_csv()
     print(len(data))
     cut_length = len(data)//10
     cut_array = data[:cut_length]
