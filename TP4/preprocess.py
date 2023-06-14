@@ -190,9 +190,11 @@ def ej1_k_medias():
         training = np.concatenate((training, df_list[j]), axis=0)
     # training = training.to_numpy()
     print("test")
-    print(len(test))
+    #print(len(test))
     print("training")
-    print(len(training))
+    #print(len(training))
+
+    k_media_codo(training)
     k = 7
     centroids, clusters = k_means(training, k, iterations=2000, threshold=0.001)
     # print("Centroids")
@@ -229,9 +231,27 @@ def ej1_k_medias():
     plt.colorbar()
     plt.show()
 
+def k_media_codo(training):
+    distances_avg = []
+    k = range(2,16)
 
+    for i in range(2,16):
+        
+        centroids, clusters = k_means(training, i, iterations=2000, threshold=0.001)
+        distance = 0
+        distances = []
+        for i,cluster in enumerate(clusters):
+            distance = np.linalg.norm(centroids[i] - cluster, axis=1)
+            distance = (sum(distance))/len(distance)
+            distances.append(distance)
+        distances_avg.append(sum(distances)/len(distances))
 
-
+    plt.title("Metodo del Codo")
+    plt.xlabel('k')
+    plt.ylabel('Distancia Media')
+    plt.plot(k,distances_avg, 'o-')
+    #plt.gca().legend(('k=3','k=5','k=7','k=9'))
+    plt.show()            
 
 
 
@@ -241,3 +261,4 @@ if __name__ == "__main__":
     ej1_k_medias()
     #ej1_hierarchical()
     #ej1_k_medias()
+
