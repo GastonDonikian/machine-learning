@@ -9,9 +9,32 @@ import metrics
 import pickle
 
 
-
 def date_to_int(d):
     return str(d)
+
+
+def grouping_csv():
+    data_frame = pd.read_csv('./resources/movie_data.csv', delimiter=';')
+    column_titles = data_frame.columns.tolist()
+    data_frame = data_frame.iloc[1:]
+    data_frame = data_frame.dropna()
+    data_frame.drop('imdb_id', axis=1, inplace=True)
+    data_frame.drop('original_title', axis=1, inplace=True)
+    data_frame.drop('overview', axis=1, inplace=True)
+    data_frame.drop('release_date', axis=1, inplace=True)
+    variables = ['budget', 'popularity', 'production_companies', 'production_countries', 'revenue', 'runtime', 'spoken_languages', 'vote_average', 'vote_count']
+    genre_preprocess = ['Adventure', 'Comedy', 'Action', 'Drama', 'Crime', 'Fantasy','Science Fiction',
+                        'Horror', 'Romance', 'Mystery', 'Thriller', 'Documentary', 'Animation',
+                        'Family', 'History', 'War', 'Western', 'Music', 'TV Movie','Foreign']
+    for variable in variables:
+        bars = data_frame.groupby(['genres'])[variable].mean()
+        err = data_frame.groupby(['genres'])[variable].std()
+        plt.barh(genre_preprocess, bars, xerr=err, align='center')
+        plt.xlabel('Average: ' + variable)
+        plt.ylabel('Values')
+        plt.savefig('./images/genero_vs_average/' + variable + '.png')
+        plt.show()
+
 
 
 def preprocess_csv():
@@ -40,29 +63,29 @@ def preprocess_csv():
 
 
 def ejercicio_a():
-    data_frame = pd.read_csv('./resources/movie_data.csv', delimiter=';')
+    grouping_csv()
+    data_frame = preprocess_csv()
     column_titles = data_frame.columns.tolist()
     data_frame = data_frame.iloc[1:]
-    numeric_columns = data_frame.apply(pd.to_numeric, errors='coerce').notnull().all()
-    numeric_data_frame = data_frame[data_frame.columns[numeric_columns]]
-
-    for i, column in enumerate(numeric_data_frame.columns):
-        plt.figure()
-        plt.boxplot(numeric_data_frame[column])
-        plt.title(column_titles[i])
-        plt.xlabel('Columns')
-        plt.ylabel('Values')
-    # Display the boxplots
+    plt.rcParams["figure.figsize"] = [17.50, 7.50]
+    plt.rcParams["figure.autolayout"] = True
+    plt.figure()
+    plt.boxplot(data_frame, labels=column_titles)
+    plt.xlabel('Columns')
+    plt.grid()
+    plt.ylabel('Values')
+    # plt.savefig('./images/analisis_univariado/boxplot_variables_no_estandarizadas.png')
     plt.show()
 
 
 def hierarchical_graph(clusters):
-    #print("HOLA")
+    # print("HOLA")
     print(clusters)
+
 
 def ej1_hierarchical():
     data = preprocess_csv()
-    cut_length = len(data)//400
+    cut_length = len(data) // 400
 
     cut_array = data[:cut_length]
     print(len(cut_array))
@@ -163,8 +186,9 @@ def ej1_k_medias():
 
 
 if __name__ == "__main__":
+    grouping_csv()
     # main()
     # ej1_kohonen()
-    ej1_k_medias()
-    ej1_hierarchical()
-    #ej1_k_medias()
+    # ej1_k_medias()
+    # ej1_hierarchical()
+    # ej1_k_medias()
