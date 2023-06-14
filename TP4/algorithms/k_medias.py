@@ -56,17 +56,17 @@ def k_means(data, k, iterations=1000, threshold=0.001):
             # le agrego ese punto al cluster
             clusters[cluster_index].append(point)
 
-        print("Centroids")
-        print(centroids)
-        print("New Centroids")
-        print(new_centroids)
+        #print("Centroids")
+        #print(centroids)
+        #print("New Centroids")
+        #print(new_centroids)
         
 
         # me fijo que el threshold no sea menor.
         # se puede ver la doble inclusion pero me dio paja
         max_distance = np.max([_calculate_distance(centroids[i], new_centroids[i]) for i in range(k)])
-        print("Max distance")
-        print(max_distance)
+        #print("Max distance")
+        #print(max_distance)
         if max_distance < threshold:
             break
 
@@ -74,7 +74,9 @@ def k_means(data, k, iterations=1000, threshold=0.001):
 
     return centroids, clusters
 
-
+def get_cluster_by_point(point,centroids):
+    distances = [_calculate_distance(point, centroid) for centroid in centroids]
+    return np.argmin(distances)
 
 
 
