@@ -1,0 +1,46 @@
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import confusion_matrix,precision_score
+import numpy as np
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+
+
+def logistin_regresion_function(x,y):
+    X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2)
+
+    logistic_regresion = LogisticRegression()
+
+    logistic_regresion.fit(X_train, y_train)
+    y_pred = logistic_regresion.predict(X_test)
+
+    coefficients = logistic_regresion.coef_
+
+    coef_df = pd.DataFrame({'Variable': x.columns, 'Coeficiente': coefficients[0]})
+
+    coef_df['Coeficiente_Abs'] = coef_df['Coeficiente'].abs()
+
+    coef_df = coef_df.sort_values('Coeficiente_Abs', ascending=False)
+
+    print(coef_df)
+
+
+    matriz = confusion_matrix(y_test, y_pred)
+    print('Matriz de Confusión:')
+    print(matriz)
+
+    precision = precision_score(y_test, y_pred)
+    print('Precisión del modelo:')
+    print(precision)
+
+
+def main():
+    data = pd.read_csv('./resources/german_credit.csv')
+    creditability = data['Creditability']
+    data = data.drop(['Creditability'], axis=1)
+    for column in data:
+        col = data[column]
+        data[column] = (col - col.mean()) / col.std()
+    logistin_regresion_function(data, creditability)
+
+if __name__ == "__main__":
+    main()
