@@ -7,7 +7,7 @@ from algorithms.k_medias import k_means, get_cluster_by_point
 import numpy as np
 import metrics
 import pickle
-
+import math
 
 def date_to_int(d):
     return str(d)
@@ -64,6 +64,8 @@ def preprocess_csv():
         data_frame[column] = (col - col.mean()) / col.std()
     print("Normalized genres")
     print(data_frame['genres'])
+    encabezado = data_frame.columns
+    print(encabezado)
     #print(data_frame)
     data = data_frame.to_numpy()
     return data
@@ -176,6 +178,91 @@ def ej1_kohonen():
     plt.show()
 
 
+def _calculate_distance(point_1, point_2):
+    print("Holi1")
+    print (point_1)
+    print(point_2)
+    print("holi")
+    return np.linalg.norm((point_1 - point_2),ord= 2)
+
+def kohonen():
+    data = preprocess_csv()
+    cut_length = len(data)
+    cut_array = data[:cut_length]
+    epochs = 500
+    k=5
+    rows = k
+    cols = k
+    trained_matrix, mean_distances_per_epoch, popularity_matrix = kohonen_som(training_set=data,
+                                                                                  epochs=epochs,
+                                                                                  eta=0.1,
+                                                                                  vicinity_radius=5, rows=rows,
+                                                                                  cols=cols)
+
+    # u_matrix = calculate_u_matrix(trained_matrix)
+
+    # # Visualización de la matriz U
+    # plt.imshow(u_matrix)
+    # plt.colorbar()
+    # plt.title('U-Matrix')
+    # plt.show()
+    for i in range(0,10):
+        u_matrix = calculate_matrix_per_variable(trained_matrix,i,k)
+
+        # Visualización de la matriz U
+        plt.imshow(u_matrix)
+        plt.colorbar()
+        plt.title('U-Matrix')
+        plt.show()
+
+
+    
+
+def calculate_u_matrix(weight_matrix):
+    rows, cols, _ = weight_matrix.shape
+    print(weight_matrix)
+    u_matrix = np.zeros((rows, cols))
+
+    for row in range(rows):
+        for col in range(cols):
+            neighbors = []
+            if row > 0:
+                neighbors.append(weight_matrix[row - 1, col])
+            if row < rows - 1:
+                neighbors.append(weight_matrix[row + 1, col])
+            if col > 0:
+                neighbors.append(weight_matrix[row, col - 1])
+            if col < cols - 1:
+                neighbors.append(weight_matrix[row, col + 1])
+            
+            distances = [_calculate_distance(weight_matrix[row, col], neighbor) for neighbor in neighbors]
+            print(distances[0])
+            u_matrix[row, col] = np.mean(distances)
+    
+    return u_matrix
+
+def calculate_matrix_per_variable(weight_matrix,variable,k):
+    u_matrix = distance_matrix_by_variable(variable,k,weight_matrix)
+    return u_matrix
+
+def distance_matrix_by_variable(variable,k,w):
+        distance = np.empty((k, k))
+        for i, j in np.ndindex(distance.shape):
+            distance[i,j] = np.average([np.linalg.norm(w[i][j][variable] - n[variable]) for n in neighbours_weight(w,i,j,k)])
+        return distance
+
+def neighbours_weight(w,i,j,k,radius = 1):
+    x_range_neighbour= range(max(0, math.floor(i - radius)), 1 + min(k - 1, math.ceil(i + radius)))
+    y_range_neighbour = range(max(0, math.floor(j - radius)), 1 + min(k- 1, math.ceil(j + radius)))
+
+    neurons = []
+    for x in  x_range_neighbour:
+        for y in y_range_neighbour:
+            neurons.append(w[x,y])
+
+    return neurons
+
+
 def ej1_k_medias():
     data = preprocess_csv()
     partition = 5
@@ -190,9 +277,11 @@ def ej1_k_medias():
         training = np.concatenate((training, df_list[j]), axis=0)
     # training = training.to_numpy()
     print("test")
-    print(len(test))
+    #print(len(test))
     print("training")
-    print(len(training))
+    #print(len(training))
+
+    k_media_codo(training)
     k = 7
     centroids, clusters = k_means(training, k, iterations=2000, threshold=0.001)
     # print("Centroids")
@@ -229,15 +318,35 @@ def ej1_k_medias():
     plt.colorbar()
     plt.show()
 
+def k_media_codo(training):
+    distances_avg = []
+    k = range(2,16)
 
+    for i in range(2,16):
+        
+        centroids, clusters = k_means(training, i, iterations=2000, threshold=0.001)
+        distance = 0
+        distances = []
+        for i,cluster in enumerate(clusters):
+            distance = np.linalg.norm(centroids[i] - cluster, axis=1)
+            distance = (sum(distance))/len(distance)
+            distances.append(distance)
+        distances_avg.append(sum(distances)/len(distances))
 
-
+    plt.title("Metodo del Codo")
+    plt.xlabel('k')
+    plt.ylabel('Distancia Media')
+    plt.plot(k,distances_avg, 'o-')
+    #plt.gca().legend(('k=3','k=5','k=7','k=9'))
+    plt.show()            
 
 
 
 if __name__ == "__main__":
     # main()
     #ej1_kohonen()
-    ej1_k_medias()
+    kohonen()
+    #ej1_k_medias()
     #ej1_hierarchical()
     #ej1_k_medias()
+

@@ -29,7 +29,7 @@ def update_centroid(idx, centroids, clusters):
 def k_means(data, k, iterations=1000, threshold=0.001):
     # Me traigo k centroides 'random', o sea, elijo k puntos
     centroids = _get_k_centroids(data, k)
-    print(centroids)
+    #print(centroids)
 
 
     # Me armo k 'clusters'
@@ -38,7 +38,7 @@ def k_means(data, k, iterations=1000, threshold=0.001):
     new_centroids = np.empty((k,len(data[0])))
     #print(new_centroids)
     for i in range(iterations):
-        print(i)
+        #print(i)
         # print("Clusters:")
         # for clu in clusters:
         #     print(len(clu))
