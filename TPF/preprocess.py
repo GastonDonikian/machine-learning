@@ -62,13 +62,13 @@ def analyze(x,eps = 0.3,min_samples=4):
     total_avg_distance = max(avg_distances)
     print(total_avg_distance)
         
-    return total_avg_distance,avg_distances
+    #return total_avg_distance,avg_distances
 
     # print("Clusters")
     # print(clusters)
     
-    if 1 >0:
-        return
+    # if 1 >0:
+    #     return
 
 
 
@@ -124,6 +124,11 @@ def preprocess_tables():
     # print(x.size)
    
     normalized_x=(x-x.mean())/x.std()
+    eps = 0.5
+    min_samples = 3
+
+    return analyze(normalized_x,eps,min_samples)
+
     #print(normalized_x)
 
     points = normalized_x.to_numpy()
@@ -158,33 +163,33 @@ def preprocess_tables():
     plt.legend()
     plt.show()
 
-    return
-
-    neighbors_list = [1,2,3,4,5,6,7]
-    eps_results = []
-    distance_results = []
-    for n_neighbors in neighbors_list:
-        eps_values,avg_distance_per_eps = metodo_codo(normalized_x,n_neighbors=n_neighbors)
-        eps_results.append(eps_values)
-        distance_results.append(avg_distance_per_eps)
     
-    for i in len(neighbors_list):
-        plt.plot(eps_results[i], distance_results[i], label =('n'+str(neighbors_list[i])))
+    ## Codigo Viejo ##
+    # neighbors_list = [1,2,3,4,5,6,7]
+    # eps_results = []
+    # distance_results = []
+    # for n_neighbors in neighbors_list:
+    #     eps_values,avg_distance_per_eps = metodo_codo(normalized_x,n_neighbors=n_neighbors)
+    #     eps_results.append(eps_values)
+    #     distance_results.append(avg_distance_per_eps)
+    
+    # for i in len(neighbors_list):
+    #     plt.plot(eps_results[i], distance_results[i], label =('n'+str(neighbors_list[i])))
 
-    plt.xlabel('eps')
-    plt.ylabel('Average nearest neighbor distance')
-    plt.title('DBSCAN - Método del Codo ')
-    plt.show()
+    # plt.xlabel('eps')
+    # plt.ylabel('Average nearest neighbor distance')
+    # plt.title('DBSCAN - Método del Codo ')
+    # plt.show()
+    ###################
 
-
-    return metodo_codo(normalized_x,n_neighbors=4)
+    #return metodo_codo(normalized_x,n_neighbors=4)
     return analyze(normalized_x,eps,min_samples)
 
 
 def sample_list_vs_maxima_distancia_media_cluster():
 
-    x = pd.read_csv('./resources/cluster_blobs.csv', delimiter=',')
-    x = x.dropna()
+    # x = pd.read_csv('./resources/cluster_blobs.csv', delimiter=',')
+    # x = x.dropna()
 
 
     total_distances = []
@@ -252,8 +257,8 @@ def display_clustering(data,dbscan):
     plt.show()
 
 def metodo_codo(X,n_neighbors=4):
-    data = pd.read_csv('./resources/cluster_blobs.csv', delimiter=',')
-    X = data.dropna()
+    # data = pd.read_csv('./resources/cluster_blobs.csv', delimiter=',')
+    # X = data.dropna()
     X_original = X
 
     #X_original=(X-X.mean())/X.std()
