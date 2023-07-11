@@ -11,6 +11,9 @@ import math
 from sklearn.neighbors import NearestNeighbors
 import heapq
 
+from TPF.dataset_analisis import univariable_analisis
+
+
 def average_distance(points):
     distances = []
     if len(points) <= 1:
@@ -117,12 +120,12 @@ def preprocess_tables():
     
     #x = avg_sleep_mins_per_user_id.set_index('Id').join(avg_daily_steps_per_user_id.set_index('Id')).join(avg_daily_distance_per_user_id.set_index('Id'))
     x = pd.merge(daily_sleep_mins_per_user_id,daily_activity_per_user_id , on=['Id', 'Date'], how='inner')
-
-  
-    x = x[['Calories', 'TotalSteps', 'TotalDistance', 'TotalMinutesAsleep']]
+    print(x.columns)
+    x['TotalMinutesAwake'] = x['TotalTimeInBed'] - x['TotalMinutesAsleep']
+    x = x[['Calories', 'TotalSteps', 'TotalDistance', 'TotalMinutesAsleep', 'TotalMinutesAwake', 'SedentaryMinutes']]
     # print(x)
     # print(x.size)
-   
+    univariable_analisis(x)
     normalized_x=(x-x.mean())/x.std()
     eps = 0.5
     min_samples = 3
@@ -310,7 +313,7 @@ def metodo_codo(X,n_neighbors=4):
     
     # Graficar clustering
     
-    return eps_values,avg_distance_per_eps
+    return eps_values, avg_distance_per_eps
 
     # Graficar los resultados
     print("eps_values")
@@ -324,7 +327,7 @@ def metodo_codo(X,n_neighbors=4):
     plt.show()
 
 
+
 if __name__ == "__main__":
     preprocess_tables()
     #metodo_codo()
-    
