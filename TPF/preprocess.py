@@ -19,30 +19,66 @@ def analyze(x):
     print(column_names)
 
     clusters = dbscan.fit_predict(x)
+    
+
+    # Get unique clusters, excluding noise points
+    unique_clusters = np.unique(clusters)
+
+    # Define a colormap for clusters
+    colormap = plt.cm.get_cmap('viridis', len(unique_clusters) - 1)
+    
 
     # Print the clusters
     #print("Data Points:\n", x)
     #print("Cluster Labels:\n", clusters)
 
-
-
-    for column in x.columns:
-        plt.figure()
-        plt.title(f'Heatmap of {column} by Cluster')
-        
+    for colum in x.columns:
         # Create a copy of the dataframe and add the cluster labels
-        ordered_df = x.copy()
+        ordered_df = data.copy()
         ordered_df['Cluster Labels'] = clusters
-        
-        # Sort the dataframe by the variable column within each cluster
-        ordered_df = ordered_df.sort_values(by=[column])
-        sns.heatmap(ordered_df[[column]], cmap='plasma', cbar=False)
-        #plt.xlabel(clusters)
-        y_labels = [round(value, 2) for value in ordered_df[column]]
-        print(y_labels)
-        #plt.ylabel(y_labels)
-        plt.yticks(ticks=range(len(ordered_df)), labels=y_labels)
+        # Sort the dataframe by the 'Calories' column
+        ordered_df = ordered_df.sort_values(by=colum)
+        # Create a line plot with different colors for each cluster
+        for cluster in unique_clusters:
+            if cluster == -1:
+                print("HOLA")
+                cluster_data = ordered_df[ordered_df['Cluster Labels'] == cluster]
+                plt.scatter(cluster_data[colum], cluster_data['Cluster Labels'], marker='o', linestyle='', color='grey', label='Noise')
+            else:
+                cluster_data = ordered_df[ordered_df['Cluster Labels'] == cluster]
+                plt.scatter(cluster_data[colum], cluster_data['Cluster Labels'], marker='o', linestyle='', color=colormap(cluster))
+
+
+
+        plt.xlabel(colum)
+        plt.ylabel('Cluster Labels')
+        plt.title('Number of Clusters by ' + colum)
         plt.show()
+
+
+
+
+
+
+
+
+    # for column in x.columns:
+    #     plt.figure()
+    #     plt.title(f'Heatmap of {column} by Cluster')
+        
+    #     # Create a copy of the dataframe and add the cluster labels
+    #     ordered_df = x.copy()
+    #     ordered_df['Cluster Labels'] = clusters
+        
+    #     # Sort the dataframe by the variable column within each cluster
+    #     ordered_df = ordered_df.sort_values(by=[column])
+    #     sns.heatmap(ordered_df[[column]], cmap='plasma', cbar=False)
+    #     #plt.xlabel(clusters)
+    #     y_labels = [round(value, 2) for value in ordered_df[column]]
+    #     print(y_labels)
+    #     #plt.ylabel(y_labels)
+    #     plt.yticks(ticks=range(len(ordered_df)), labels=y_labels)
+    #     plt.show()
     # Plot the clusters
     #plt.scatter(x[:, 0], x[:,1], c = labels, cmap= "plasma") # plotting the clusters
     #plt.scatter(x[column_names[0]], x[column_names[1]], c = labels, cmap= "plasma") # plotting the clusters
@@ -75,7 +111,7 @@ def preprocess_tables():
     print(x.size)
    
     normalized_x=(x-x.mean())/x.std()
-    analyze(normalized_x)
+    analyze(normalized_x,x)
     
 
 
