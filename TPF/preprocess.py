@@ -29,7 +29,7 @@ def average_distance(points):
     return sum(distances) / len(distances)
 
 
-def analyze(x,eps = 0.3,min_samples=4,data = None):
+def analyze(x,eps = 0.5,min_samples=2,data = None):
     #function fit dbscan
     print("Started Analyzing")
     # cluster the data into five clusters
@@ -150,11 +150,11 @@ def preprocess_tables():
     x = x[['Calories', 'TotalSteps', 'TotalDistance', 'TotalMinutesAsleep', 'TotalMinutesAwake']]
     # print(x)
     # print(x.size)
-    univariable_analisis(x)
+    #univariable_analisis(x)
     normalized_x=(x-x.mean())/x.std()
     #analyze(normalized_x,x)
     eps = 0.5
-    min_samples = 3
+    min_samples = 2
 
     return analyze(normalized_x,eps,min_samples,x)
 
